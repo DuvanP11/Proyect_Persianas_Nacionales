@@ -1,0 +1,336 @@
+// ============================================================================
+//  Cortinería Nacional — Modelo de datos (Prisma + PostgreSQL)
+// ----------------------------------------------------------------------------
+//  Cubre toda la plataforma para no rehacer la estructura en fases futuras:
+//  usuarios/roles, clientes, catálogo, cotizaciones, pedidos + seguimiento,
+//  facturación, inventario, promociones, reseñas y auditoría.
+//  Genera el cliente con:  npx prisma generate
+//  Aplica el esquema con:  npx prisma db push   (o migrate dev)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+//  Autenticación y roles
+// ---------------------------------------------------------------------------
+enum Role {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(CUSTOMER)
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customer  Customer?
+  auditLogs AuditLog[]
+  favorites Favorite[]
+}
+
+// ---------------------------------------------------------------------------
+//  Clientes (clasificación automática por comportamiento)
+// ---------------------------------------------------------------------------
+enum CustomerType {
+  POTENCIAL
+  ACTIVO
+  FRECUENTE
+  INACTIVO
+}
+
+model Customer {
+  id        String       @id @default(cuid())
+  userId    String?      @unique
+  user      User?        @relation(fields: [userId], references: [id])
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  city      String?
+  address   String?
+  type      CustomerType @default(POTENCIAL)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  quotes Quote[]
+  orders Order[]
+
+  @@index([email])
+  @@index([type])
+}
+
+// ---------------------------------------------------------------------------
+//  Catálogo
+// ---------------------------------------------------------------------------
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  shortDesc      String?
+  description    String?
+  fabric         String? // tipo de tela
+  material       String?
+  design         String? // diseño
+  colors         Json? // [{ name, hex }]
+  pricePerMeter  Int? // en pesos (COP), null => cotiza tu medida
+  price          Int?
+  productionTime String?
+  features       String[]
+  gradient       String? // respaldo visual mientras no hay foto
+  stock          Int      @default(0)
+  isActive       Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  media ProductMedia[]
+
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model ProductMedia {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type      MediaType @default(IMAGE)
+  url       String
+  alt       String?
+  sortOrder Int       @default(0)
+}
+
+// ---------------------------------------------------------------------------
+//  Cotizaciones
+// ---------------------------------------------------------------------------
+enum QuoteStatus {
+  NUEVA
+  CONTACTADA
+  CONVERTIDA
+  DESCARTADA
+}
+
+model Quote {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  firstName   String
+  lastName    String
+  phone       String
+  email       String
+  city        String
+  address     String
+  productName String
+  quantity    Int         @default(1)
+  meters      Float?
+  comments    String?
+  promoCode   String?
+  discountPct Float?
+  status      QuoteStatus @default(NUEVA)
+  customerId  String?
+  customer    Customer?   @relation(fields: [customerId], references: [id])
+  order       Order?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
+// ---------------------------------------------------------------------------
+//  Pedidos y seguimiento
+// ---------------------------------------------------------------------------
+enum OrderStatus {
+  RECIBIDO
+  FABRICACION
+  CORTE
+  CONFECCION
+  DESPACHO
+  INSTALACION
+  FINALIZADO
+  CANCELADO
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  customerId  String
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  quoteId     String?     @unique
+  quote       Quote?      @relation(fields: [quoteId], references: [id])
+  status      OrderStatus @default(RECIBIDO)
+  total       Int         @default(0)
+  installerId String?
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  history  OrderStatusHistory[]
+  invoices Invoice[]
+
+  @@index([status])
+  @@index([customerId])
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+}
+
+// ---------------------------------------------------------------------------
+//  Facturación
+// ---------------------------------------------------------------------------
+model Invoice {
+  id        String   @id @default(cuid())
+  number    String   @unique
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  amount    Int
+  pdfUrl    String?
+  issuedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+//  Inventario
+// ---------------------------------------------------------------------------
+enum InventoryCategory {
+  TELA
+  MATERIAL
+  ACCESORIO
+  MOTOR
+  INSUMO
+}
+
+model InventoryItem {
+  id        String            @id @default(cuid())
+  name      String
+  category  InventoryCategory
+  unit      String            @default("unidad")
+  stock     Float             @default(0)
+  minStock  Float             @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  movements InventoryMovement[]
+
+  @@index([category])
+}
+
+enum MovementType {
+  ENTRADA
+  SALIDA
+}
+
+model InventoryMovement {
+  id        String        @id @default(cuid())
+  itemId    String
+  item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  type      MovementType
+  quantity  Float
+  reason    String?
+  createdAt DateTime      @default(now())
+}
+
+// ---------------------------------------------------------------------------
+//  Promociones (volantes)
+// ---------------------------------------------------------------------------
+model PromoCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  discountPct Float
+  isActive    Boolean   @default(true)
+  validUntil  DateTime?
+  maxUses     Int?
+  uses        Int       @default(0)
+  createdAt   DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+//  Reseñas / testimonios
+// ---------------------------------------------------------------------------
+model Review {
+  id         String   @id @default(cuid())
+  authorName String
+  rating     Int      @default(5)
+  comment    String?
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+//  Favoritos del cliente
+// ---------------------------------------------------------------------------
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+// ---------------------------------------------------------------------------
+//  Auditoría (accesos y acciones)
+// ---------------------------------------------------------------------------
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String // LOGIN, LOGOUT, CREATE, UPDATE, DELETE, DOWNLOAD, LOGIN_FAILED...
+  entity    String? // p. ej. "Product", "Order"
+  entityId  String?
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+//  Configuración del sitio (editable desde el panel, sin tocar código)
+// ---------------------------------------------------------------------------
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
