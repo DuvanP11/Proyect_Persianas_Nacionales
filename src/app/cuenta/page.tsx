@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ORDER_META } from "@/lib/order-status";
 import { logoutCustomer } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -10,17 +11,6 @@ const QUOTE_LABEL: Record<string, { text: string; cls: string }> = {
   CONTACTADA: { text: "En contacto", cls: "bg-naranja/15 text-naranja-light" },
   CONVERTIDA: { text: "Convertida", cls: "bg-emerald-600/20 text-emerald-300" },
   DESCARTADA: { text: "Descartada", cls: "bg-white/5 text-mist-2" },
-};
-
-const ORDER_LABEL: Record<string, string> = {
-  RECIBIDO: "Recibido",
-  FABRICACION: "En fabricación",
-  CORTE: "Corte",
-  CONFECCION: "Confección",
-  DESPACHO: "En despacho",
-  INSTALACION: "Instalación",
-  FINALIZADO: "Finalizado",
-  CANCELADO: "Cancelado",
 };
 
 export default async function CuentaPage() {
@@ -39,6 +29,7 @@ export default async function CuentaPage() {
       ? prisma.order.findMany({
           where: { customerId: customer.id },
           orderBy: { createdAt: "desc" },
+          include: { history: { orderBy: { createdAt: "desc" }, take: 1 } },
         })
       : Promise.resolve([]),
   ]);
@@ -136,17 +127,22 @@ export default async function CuentaPage() {
             </div>
           ) : (
             <ul className="mt-6 space-y-3">
-              {orders.map((o) => (
-                <li key={o.id} className="flex items-center justify-between rounded-2xl border border-line bg-surface/60 p-5">
-                  <div>
-                    <p className="font-mono text-xs text-morado-light">{o.code}</p>
-                    <p className="text-xs text-mist-2">{new Date(o.createdAt).toLocaleDateString("es-CO")}</p>
-                  </div>
-                  <span className="rounded-full bg-morado/15 px-3 py-1 text-sm text-morado-light">
-                    {ORDER_LABEL[o.status] ?? o.status}
-                  </span>
-                </li>
-              ))}
+              {orders.map((o) => {
+                const m = ORDER_META[o.status] ?? ORDER_META.RECIBIDO;
+                const last = o.history[0];
+                return (
+                  <li key={o.id} className="flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface/60 p-5">
+                    <div>
+                      <p className="font-mono text-xs text-morado-light">{o.code}</p>
+                      <p className="text-xs text-mist-2">
+                        Pedido del {new Date(o.createdAt).toLocaleDateString("es-CO")}
+                      </p>
+                      {last?.note && <p className="mt-1 text-xs text-mist">{last.note}</p>}
+                    </div>
+                    <span className={`shrink-0 rounded-full px-3 py-1 text-sm ${m.cls}`}>{m.text}</span>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

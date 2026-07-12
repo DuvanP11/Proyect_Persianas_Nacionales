@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { updateQuoteStatus } from "./actions";
+import { updateQuoteStatus, convertToOrder } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,10 @@ function waLink(phone: string, code: string): string {
 }
 
 export default async function CotizacionesPage() {
-  const quotes = await prisma.quote.findMany({ orderBy: { createdAt: "desc" } });
+  const quotes = await prisma.quote.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { order: true },
+  });
 
   return (
     <div className="space-y-6">
@@ -41,6 +45,7 @@ export default async function CotizacionesPage() {
                 <th className="px-4 py-3 font-medium">Ciudad</th>
                 <th className="px-4 py-3 font-medium">Fecha</th>
                 <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-4 py-3 font-medium">Pedido</th>
                 <th className="px-4 py-3 font-medium">Contacto</th>
               </tr>
             </thead>
@@ -90,6 +95,26 @@ export default async function CotizacionesPage() {
                         ✓
                       </button>
                     </form>
+                  </td>
+                  <td className="px-4 py-3">
+                    {q.order ? (
+                      <Link
+                        href={`/admin/pedidos/${q.order.id}`}
+                        className="rounded-md bg-morado/15 px-2.5 py-1 text-xs text-morado-light transition hover:bg-morado/25"
+                      >
+                        {q.order.code} →
+                      </Link>
+                    ) : (
+                      <form action={convertToOrder}>
+                        <input type="hidden" name="quoteId" value={q.id} />
+                        <button
+                          type="submit"
+                          className="rounded-md border border-naranja/40 bg-naranja/10 px-2.5 py-1 text-xs text-naranja-light transition hover:bg-naranja/20"
+                        >
+                          + Pedido
+                        </button>
+                      </form>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <a

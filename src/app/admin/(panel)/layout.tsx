@@ -5,6 +5,7 @@ import { logoutAction } from "./actions";
 const NAV = [
   { href: "/admin", label: "Resumen", icon: "▦" },
   { href: "/admin/cotizaciones", label: "Cotizaciones", icon: "✎" },
+  { href: "/admin/pedidos", label: "Pedidos", icon: "◎" },
   { href: "/admin/productos", label: "Productos", icon: "◫" },
   { href: "/admin/categorias", label: "Categorías", icon: "▤" },
 ];
