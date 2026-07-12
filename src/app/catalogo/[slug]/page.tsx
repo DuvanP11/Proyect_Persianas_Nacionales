@@ -71,6 +71,14 @@ export default async function ProductPage({
 
           {/* Info */}
           <div>
+            {product.category && (
+              <Link
+                href={`/catalogo?categoria=${product.category.slug}`}
+                className="mb-2 inline-block text-xs font-semibold uppercase tracking-[0.16em] text-morado-light transition-colors hover:text-naranja"
+              >
+                {product.category.name}
+              </Link>
+            )}
             <h1 className="font-display text-4xl font-semibold text-cloud sm:text-5xl">{product.name}</h1>
             <p className="mt-4 text-lg leading-relaxed text-mist">{product.description}</p>
 

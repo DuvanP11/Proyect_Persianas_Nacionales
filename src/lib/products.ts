@@ -15,6 +15,11 @@ export interface ProductColor {
   hex: string;
 }
 
+export interface ProductCategory {
+  slug: string;
+  name: string;
+}
+
 export interface Product {
   slug: string;
   name: string;
@@ -32,6 +37,8 @@ export interface Product {
   videos: string[]; // vacío por ahora — se cargan luego
   gradient: string; // clases Tailwind para el placeholder
   featured?: boolean;
+  /** Categoría a la que pertenece (solo si está activa). `null` si no tiene. */
+  category?: ProductCategory | null;
 }
 
 export const products: Product[] = [

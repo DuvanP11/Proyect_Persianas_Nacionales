@@ -8,12 +8,33 @@ import { cn } from "@/lib/utils";
 
 type SortKey = "relevancia" | "precio-asc" | "precio-desc" | "tiempo";
 
-export function CatalogClient({ products }: { products: Product[] }) {
+export function CatalogClient({
+  products,
+  initialCategory = "",
+}: {
+  products: Product[];
+  initialCategory?: string;
+}) {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<string>(initialCategory);
   const [color, setColor] = useState<string>("");
   const [material, setMaterial] = useState<string>("");
   const [sort, setSort] = useState<SortKey>("relevancia");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(Boolean(initialCategory));
+
+  // Categorías activas del catálogo (únicas por slug), para el filtro.
+  const allCategories = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          products
+            .map((p) => p.category)
+            .filter((c): c is NonNullable<typeof c> => Boolean(c))
+            .map((c) => [c.slug, c]),
+        ).values(),
+      ).sort((a, b) => a.name.localeCompare(b.name)),
+    [products],
+  );
 
   // Colores y materiales agregados para los filtros (derivados del catálogo).
   const allColors = useMemo(
@@ -47,9 +68,10 @@ export function CatalogClient({ products }: { products: Product[] }) {
         .toLowerCase();
 
       const matchesQuery = !q || q.split(/\s+/).every((term) => haystack.includes(term));
+      const matchesCategory = !category || p.category?.slug === category;
       const matchesColor = !color || p.colors.some((c) => c.name === color);
       const matchesMaterial = !material || p.material === material;
-      return matchesQuery && matchesColor && matchesMaterial;
+      return matchesQuery && matchesCategory && matchesColor && matchesMaterial;
     });
 
     switch (sort) {
@@ -64,12 +86,13 @@ export function CatalogClient({ products }: { products: Product[] }) {
         break;
     }
     return list;
-  }, [products, query, color, material, sort]);
+  }, [products, query, category, color, material, sort]);
 
-  const hasActiveFilters = color || material || query;
+  const hasActiveFilters = category || color || material || query;
 
   const clearAll = () => {
     setQuery("");
+    setCategory("");
     setColor("");
     setMaterial("");
     setSort("relevancia");
@@ -100,7 +123,25 @@ export function CatalogClient({ products }: { products: Product[] }) {
       </div>
 
       {/* Panel de filtros */}
-      <div className={cn("grid gap-3 overflow-hidden transition-all duration-300 sm:grid-cols-3", showFilters ? "mt-4 max-h-96" : "max-h-0")}>
+      <div className={cn("grid gap-3 overflow-hidden transition-all duration-300 sm:grid-cols-2 lg:grid-cols-4", showFilters ? "mt-4 max-h-[32rem]" : "max-h-0")}>
+        {allCategories.length > 0 && (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs text-mist-2">Categoría</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="rounded-xl border border-line bg-ink-soft px-4 py-2.5 text-sm text-cloud focus:border-morado/60 focus:outline-none"
+            >
+              <option value="">Todas las categorías</option>
+              {allCategories.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-mist-2">Color</span>
           <select

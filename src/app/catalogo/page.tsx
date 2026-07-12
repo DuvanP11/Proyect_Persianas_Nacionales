@@ -8,8 +8,15 @@ export const metadata: Metadata = {
     "Explora el catálogo de cortinas y persianas de Cortinería Nacional: Blackout, Sheer Elegance, persianas motorizadas y más. Confección a la medida con instalación gratis.",
 };
 
-export default async function CatalogoPage() {
-  const products = await getCatalogProducts();
+export default async function CatalogoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ categoria?: string }>;
+}) {
+  const [products, { categoria }] = await Promise.all([
+    getCatalogProducts(),
+    searchParams,
+  ]);
 
   return (
     <div className="pt-28 md:pt-36">
@@ -28,7 +35,7 @@ export default async function CatalogoPage() {
           </p>
         </header>
 
-        <CatalogClient products={products} />
+        <CatalogClient products={products} initialCategory={categoria ?? ""} />
       </div>
     </div>
   );

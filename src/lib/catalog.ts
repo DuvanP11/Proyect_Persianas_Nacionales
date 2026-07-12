@@ -34,6 +34,7 @@ type DbProductWithMedia = {
   gradient: string | null;
   isFeatured: boolean;
   media: { type: string; url: string; sortOrder: number }[];
+  category: { slug: string; name: string; isActive: boolean } | null;
 };
 
 /** Convierte una fila de la BD a la interfaz `Product` que consume el sitio. */
@@ -55,6 +56,11 @@ function mapDbProduct(p: DbProductWithMedia): Product {
     videos: media.filter((m) => m.type === "VIDEO").map((m) => m.url),
     gradient: p.gradient ?? "from-slate-800 via-slate-700 to-slate-900",
     featured: p.isFeatured,
+    // Solo se expone la categoría al público si está activa.
+    category:
+      p.category && p.category.isActive
+        ? { slug: p.category.slug, name: p.category.name }
+        : null,
   };
 }
 
@@ -65,7 +71,7 @@ export async function getCatalogProducts(): Promise<Product[]> {
     const rows = await prisma.product.findMany({
       where: { isActive: true },
       orderBy: [{ isFeatured: "desc" }, { createdAt: "asc" }],
-      include: { media: true },
+      include: { media: true, category: true },
     });
     if (rows.length === 0) return staticProducts;
     return rows.map(mapDbProduct);
@@ -82,7 +88,7 @@ export async function getCatalogProductBySlug(
   try {
     const row = await prisma.product.findFirst({
       where: { slug, isActive: true },
-      include: { media: true },
+      include: { media: true, category: true },
     });
     if (!row) {
       // Puede que la BD esté vacía (pre-seed): cae al estático.

@@ -14,6 +14,14 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       </Link>
 
       <div className="flex flex-1 flex-col p-5">
+        {product.category && (
+          <Link
+            href={`/catalogo?categoria=${product.category.slug}`}
+            className="mb-1 inline-block w-fit text-[11px] font-semibold uppercase tracking-[0.14em] text-morado-light transition-colors hover:text-naranja"
+          >
+            {product.category.name}
+          </Link>
+        )}
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-display text-xl font-semibold text-cloud">
             <Link href={`/catalogo/${product.slug}`} className="transition-colors hover:text-morado-light">
