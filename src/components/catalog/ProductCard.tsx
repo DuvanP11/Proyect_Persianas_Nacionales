@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { MessageCircle, ArrowRight, Clock, BadgeCheck } from "lucide-react";
+import { MessageCircle, ArrowRight, BadgeCheck } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { siteConfig } from "@/lib/site-config";
-import { formatCOP } from "@/lib/utils";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 import { ProductMedia } from "./ProductMedia";
 
@@ -60,20 +59,6 @@ export function ProductCard({ product, priority = false }: { product: Product; p
               />
             ))}
           </div>
-        </div>
-
-        {/* Precio + tiempo */}
-        <div className="mt-4 flex items-end justify-between">
-          <div>
-            <span className="block text-[11px] uppercase tracking-wide text-mist-2">Desde</span>
-            <span className="font-display text-lg font-semibold text-cloud">
-              {product.pricePerMeter ? `${formatCOP(product.pricePerMeter)} /m` : "Cotiza tu medida"}
-            </span>
-          </div>
-          <span className="inline-flex items-center gap-1 text-xs text-mist">
-            <Clock className="h-3.5 w-3.5" />
-            {product.productionTime}
-          </span>
         </div>
 
         {/* Botones */}
