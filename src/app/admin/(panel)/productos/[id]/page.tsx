@@ -11,10 +11,13 @@ export default async function EditarProductoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const p = await prisma.product.findUnique({
-    where: { id },
-    include: { media: true },
-  });
+  const [p, categories] = await Promise.all([
+    prisma.product.findUnique({ where: { id }, include: { media: true } }),
+    prisma.category.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true },
+    }),
+  ]);
   if (!p) notFound();
 
   const media = [...p.media].sort((a, b) => a.sortOrder - b.sortOrder);
@@ -38,6 +41,7 @@ export default async function EditarProductoPage({
     videos: media.filter((m) => m.type === "VIDEO").map((m) => m.url).join("\n"),
     isActive: p.isActive,
     isFeatured: p.isFeatured,
+    categoryId: p.categoryId ?? "",
   };
 
   return (
@@ -56,7 +60,7 @@ export default async function EditarProductoPage({
           Ver en el sitio →
         </a>
       </div>
-      <ProductForm initial={initial} />
+      <ProductForm initial={initial} categories={categories} />
     </div>
   );
 }

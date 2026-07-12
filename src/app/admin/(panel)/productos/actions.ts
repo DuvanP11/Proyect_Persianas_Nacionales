@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { slugify } from "@/lib/slug";
 
 export type ProductFormState = { error?: string };
 
@@ -16,15 +17,6 @@ function revalidateCatalog(slug?: string) {
   revalidatePath("/admin/productos");
   revalidatePath("/admin");
   if (slug) revalidatePath(`/catalogo/${slug}`);
-}
-
-function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // quita acentos
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 /** Convierte un textarea (una línea por elemento) en arreglo, sin vacíos. */
@@ -94,6 +86,7 @@ export async function saveProduct(
       "from-slate-800 via-slate-700 to-slate-900",
     isActive: formData.get("isActive") === "on",
     isFeatured: formData.get("isFeatured") === "on",
+    categoryId: String(formData.get("categoryId") ?? "").trim() || null,
   };
 
   const mediaRows = [

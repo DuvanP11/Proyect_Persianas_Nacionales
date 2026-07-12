@@ -22,7 +22,10 @@ export type ProductFormValues = {
   videos: string;
   isActive: boolean;
   isFeatured: boolean;
+  categoryId: string;
 };
+
+export type CategoryOption = { id: string; name: string };
 
 const EMPTY: ProductFormValues = {
   name: "",
@@ -41,6 +44,7 @@ const EMPTY: ProductFormValues = {
   videos: "",
   isActive: true,
   isFeatured: false,
+  categoryId: "",
 };
 
 const input =
@@ -48,7 +52,13 @@ const input =
 const label = "mb-1.5 block text-sm text-mist";
 const hint = "mt-1 text-xs text-mist-2";
 
-export function ProductForm({ initial }: { initial?: ProductFormValues }) {
+export function ProductForm({
+  initial,
+  categories = [],
+}: {
+  initial?: ProductFormValues;
+  categories?: CategoryOption[];
+}) {
   const values = initial ?? EMPTY;
   const isEdit = Boolean(initial?.id);
   const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
@@ -78,6 +88,26 @@ export function ProductForm({ initial }: { initial?: ProductFormValues }) {
             <label className={label}>Slug (URL)</label>
             <input name="slug" defaultValue={values.slug} className={input} placeholder="se genera del nombre si lo dejas vacío" />
             <p className={hint}>Se usa en /catalogo/&lt;slug&gt;. Déjalo vacío para generarlo del nombre.</p>
+          </div>
+          <div className="sm:col-span-2">
+            <label className={label}>Categoría</label>
+            <select name="categoryId" defaultValue={values.categoryId} className={input}>
+              <option value="">— Sin categoría —</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            {categories.length === 0 && (
+              <p className={hint}>
+                No hay categorías todavía. Créalas en{" "}
+                <Link href="/admin/categorias" className="text-morado-light hover:underline">
+                  Categorías
+                </Link>
+                .
+              </p>
+            )}
           </div>
           <div className="sm:col-span-2">
             <label className={label}>Descripción corta (tarjeta)</label>

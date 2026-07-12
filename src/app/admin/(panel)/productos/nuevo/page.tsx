@@ -1,7 +1,14 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 import { ProductForm } from "../ProductForm";
 
-export default function NuevoProductoPage() {
+export const dynamic = "force-dynamic";
+
+export default async function NuevoProductoPage() {
+  const categories = await prisma.category.findMany({
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: { id: true, name: true },
+  });
   return (
     <div className="space-y-6">
       <div>
@@ -10,7 +17,7 @@ export default function NuevoProductoPage() {
         </Link>
         <h1 className="mt-2 font-display text-3xl text-cloud">Nuevo producto</h1>
       </div>
-      <ProductForm />
+      <ProductForm categories={categories} />
     </div>
   );
 }

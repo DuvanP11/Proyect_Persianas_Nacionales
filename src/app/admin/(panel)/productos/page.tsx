@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatCOP } from "@/lib/utils";
-import { ConfirmDeleteButton } from "./ConfirmDeleteButton";
+import { ConfirmDeleteButton } from "@/components/admin/ConfirmDeleteButton";
 import {
   deleteProduct,
   toggleProductActive,
