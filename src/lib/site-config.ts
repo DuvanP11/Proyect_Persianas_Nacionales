@@ -44,6 +44,10 @@ export const siteConfig = {
 
   // Beneficio destacado que aparece en cada producto
   freeInstall: "Instalación totalmente GRATIS",
+
+  // Mostrar precios al público. Ponlo en `true` para volver a mostrarlos en la
+  // ficha del producto y el estimado del formulario de cotización.
+  showPrices: false,
 } as const;
 
 export type SiteConfig = typeof siteConfig;

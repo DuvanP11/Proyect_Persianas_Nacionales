@@ -8,6 +8,7 @@ import { MessageCircle, Loader2, CheckCircle2, Tag, Calculator } from "lucide-re
 import { quoteSchema, type QuoteInput } from "@/lib/schemas";
 import type { Product } from "@/lib/products";
 import { formatCOP } from "@/lib/utils";
+import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quoteToWhatsAppMessage } from "@/lib/whatsapp";
 
 const inputClass =
@@ -285,7 +286,7 @@ export function QuoteForm({
       </div>
 
       {/* Estimación de precio */}
-      {total != null && (
+      {siteConfig.showPrices && total != null && (
         <div className="mt-5 flex items-center justify-between rounded-2xl border border-morado/25 bg-morado/[0.06] px-5 py-4">
           <span className="flex items-center gap-2 text-sm text-mist">
             <Calculator className="h-4 w-4 text-morado-light" /> Estimado referencial
