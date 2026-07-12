@@ -50,6 +50,29 @@ export function QuoteForm({
   const metros = watch("metros");
   const cantidad = watch("cantidad");
   const descuentoPct = watch("descuentoPct");
+  const codigoPromo = watch("codigoPromo");
+
+  const [promo, setPromo] = useState<{ state: "idle" | "checking" | "ok" | "bad"; msg?: string }>({
+    state: "idle",
+  });
+
+  const validarCodigo = async () => {
+    const code = (codigoPromo ?? "").trim();
+    if (!code) return;
+    setPromo({ state: "checking" });
+    try {
+      const res = await fetch(`/api/promo?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if (data.valid) {
+        setValue("descuentoPct", data.discountPct);
+        setPromo({ state: "ok", msg: `¡Código válido! ${data.discountPct}% de descuento aplicado.` });
+      } else {
+        setPromo({ state: "bad", msg: data.reason ?? "Código no válido" });
+      }
+    } catch {
+      setPromo({ state: "bad", msg: "No se pudo validar el código" });
+    }
+  };
 
   // Estimación de precio (referencial)
   const selected = products.find((p) => p.name === productoName);
@@ -227,7 +250,22 @@ export function QuoteForm({
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div>
                   <label className={labelClass}>Código</label>
-                  <input className={inputClass} placeholder="Ej: PROMO20" {...register("codigoPromo")} />
+                  <div className="flex gap-2">
+                    <input className={inputClass} placeholder="Ej: PROMO20" {...register("codigoPromo")} />
+                    <button
+                      type="button"
+                      onClick={validarCodigo}
+                      disabled={promo.state === "checking"}
+                      className="shrink-0 rounded-xl border border-morado/50 px-3 text-sm text-morado-light transition hover:bg-morado/10 disabled:opacity-60"
+                    >
+                      {promo.state === "checking" ? "…" : "Validar"}
+                    </button>
+                  </div>
+                  {promo.msg && (
+                    <p className={`mt-1 text-xs ${promo.state === "ok" ? "text-emerald-400" : "text-red-400"}`}>
+                      {promo.msg}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className={labelClass}>Porcentaje de descuento (%)</label>
