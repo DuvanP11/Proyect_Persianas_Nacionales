@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# archivos subidos por el admin (local; en producción usar Cloudinary)
+/public/uploads/
+
 # credenciales generadas del admin (local)
 .admin-credentials.txt

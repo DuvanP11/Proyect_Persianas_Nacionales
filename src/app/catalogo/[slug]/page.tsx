@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Clock, MessageCircle, BadgeCheck, Image as ImageIcon, Play } from "lucide-react";
+import { ArrowLeft, Check, Clock, MessageCircle, BadgeCheck } from "lucide-react";
 import { getCatalogProductBySlug, getCatalogProducts, getCatalogSlugs } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site-config";
 import { formatCOP } from "@/lib/utils";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
-import { ProductMedia } from "@/components/catalog/ProductMedia";
+import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -51,23 +51,7 @@ export default async function ProductPage({
 
         <div className="mt-8 grid gap-10 lg:grid-cols-2">
           {/* Galería */}
-          <div>
-            <div className="group overflow-hidden rounded-3xl border border-line">
-              <ProductMedia product={product} className="aspect-[4/3]" priority />
-            </div>
-            {/* Miniaturas / videos — espacio preparado para los archivos reales */}
-            <div className="mt-4 grid grid-cols-4 gap-3">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="flex aspect-square items-center justify-center rounded-xl border border-dashed border-line bg-ink-soft text-mist-2">
-                  <ImageIcon className="h-5 w-5" />
-                </div>
-              ))}
-              <div className="flex aspect-square items-center justify-center rounded-xl border border-dashed border-line bg-ink-soft text-mist-2">
-                <Play className="h-5 w-5" />
-              </div>
-            </div>
-            <p className="mt-2 text-center text-xs text-mist-2">Galería lista para cargar fotos y videos.</p>
-          </div>
+          <ProductGallery product={product} />
 
           {/* Info */}
           <div>
@@ -82,12 +66,16 @@ export default async function ProductPage({
             <h1 className="font-display text-4xl font-semibold text-cloud sm:text-5xl">{product.name}</h1>
             <p className="mt-4 text-lg leading-relaxed text-mist">{product.description}</p>
 
-            {/* Precio */}
+            {/* Precio / tiempo */}
             <div className="mt-6 flex items-end gap-6">
               <div>
-                <span className="block text-xs uppercase tracking-wide text-mist-2">Precio por metro</span>
+                <span className="block text-xs uppercase tracking-wide text-mist-2">
+                  {siteConfig.showPrices && product.pricePerMeter ? "Precio por metro" : "Precio"}
+                </span>
                 <span className="font-display text-3xl font-semibold text-gradient-brand">
-                  {product.pricePerMeter ? `${formatCOP(product.pricePerMeter)}` : "Cotiza tu medida"}
+                  {siteConfig.showPrices && product.pricePerMeter
+                    ? formatCOP(product.pricePerMeter)
+                    : "Cotiza tu medida"}
                 </span>
               </div>
               <span className="inline-flex items-center gap-1.5 pb-1 text-sm text-mist">

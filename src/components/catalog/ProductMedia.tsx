@@ -26,6 +26,7 @@ export function ProductMedia({
           alt={product.name}
           fill
           priority={priority}
+          unoptimized={src.startsWith("/api/uploads/")}
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
