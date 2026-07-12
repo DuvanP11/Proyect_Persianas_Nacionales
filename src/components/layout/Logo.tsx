@@ -13,25 +13,24 @@ import { cn } from "@/lib/utils";
  * El ícono es morado en ambos casos (color de acento de la marca).
  */
 function BlindsMark({ className }: { className?: string }) {
+  // Lamas como paralelogramos inclinados (top desplazado a la derecha).
+  const slat = (top: number) => {
+    const X = 11.5, W = 18.5, H = 4.4, SKEW = 3, Yb = top + H;
+    return `${X},${Yb} ${X + SKEW},${top} ${X + W + SKEW},${top} ${X + W},${Yb}`;
+  };
+  const AUBERGINE = "#3f2a5c";
   return (
-    <svg viewBox="0 0 44 44" className={className} role="img" aria-hidden="true" fill="none">
-      <defs>
-        <linearGradient id="cn-blinds" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#a78bfa" />
-          <stop offset="1" stopColor="#6d28d9" />
-        </linearGradient>
-      </defs>
+    <svg viewBox="0 0 48 48" className={className} role="img" aria-hidden="true">
+      {/* Placa circular */}
+      <circle cx="24" cy="24" r="23" fill="#ffffff" stroke="#241a33" strokeWidth="1.5" />
       {/* Lamas de la persiana */}
-      {[2.5, 11.5, 20.5, 29.5].map((y) => (
-        <g key={y}>
-          <rect x="3" y={y} width="27" height="6.6" rx="1.6" fill="url(#cn-blinds)" />
-          <rect x="5.5" y={y + 1.5} width="22" height="0.9" rx="0.45" fill="#ffffff" opacity="0.2" />
-          <rect x="5.5" y={y + 3.7} width="22" height="0.9" rx="0.45" fill="#000000" opacity="0.14" />
-        </g>
+      {[12.8, 19, 25.2, 31.4].map((top) => (
+        <polygon key={top} points={slat(top)} fill={AUBERGINE} />
       ))}
-      {/* Soporte + base */}
-      <rect x="33.4" y="2" width="2.6" height="36" rx="1.3" fill="url(#cn-blinds)" />
-      <circle cx="34.7" cy="41" r="2.7" fill="url(#cn-blinds)" />
+      {/* Asta */}
+      <rect x="33.6" y="11" width="1.8" height="25" rx="0.9" fill={AUBERGINE} />
+      {/* Base / pesa */}
+      <path d="M32.9 35.8 L35.9 35.8 L35.1 38.4 L34.4 39.6 L33.7 38.4 Z" fill={AUBERGINE} />
     </svg>
   );
 }
