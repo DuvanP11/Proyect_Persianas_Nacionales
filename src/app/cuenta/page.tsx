@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_META } from "@/lib/order-status";
-import { logoutCustomer } from "./actions";
+import { logoutCustomer, submitReview } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -145,6 +145,38 @@ export default async function CuentaPage() {
               })}
             </ul>
           )}
+        </section>
+
+        {/* Dejar una reseña */}
+        <section className="mt-12">
+          <h2 className="font-display text-2xl text-cloud">Deja tu reseña</h2>
+          <p className="mt-1 text-sm text-mist">
+            Tu opinión nos ayuda. Se publicará en el sitio una vez la revisemos.
+          </p>
+          <form action={submitReview} className="mt-4 rounded-2xl border border-line bg-surface/60 p-5">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-mist">Calificación</label>
+              <select
+                name="rating"
+                defaultValue="5"
+                className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-cloud outline-none focus:border-morado"
+              >
+                {[5, 4, 3, 2, 1].map((n) => (
+                  <option key={n} value={n}>{n} ★</option>
+                ))}
+              </select>
+            </div>
+            <textarea
+              name="comment"
+              required
+              rows={3}
+              placeholder="Cuéntanos tu experiencia con Cortinería Nacional…"
+              className="mt-3 w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm text-cloud outline-none focus:border-morado"
+            />
+            <button className="mt-3 rounded-full bg-gradient-to-r from-morado to-naranja px-5 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5">
+              Enviar reseña
+            </button>
+          </form>
         </section>
       </div>
     </div>

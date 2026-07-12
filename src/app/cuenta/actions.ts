@@ -1,9 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { setSession, clearSession } from "@/lib/auth";
+import { setSession, clearSession, requireCustomer } from "@/lib/auth";
 
 export type AuthState = { error?: string };
 
@@ -67,4 +68,22 @@ export async function loginCustomer(
 export async function logoutCustomer(): Promise<void> {
   await clearSession();
   redirect("/");
+}
+
+/** Un cliente autenticado deja una reseña (queda pendiente de aprobación). */
+export async function submitReview(formData: FormData): Promise<void> {
+  const session = await requireCustomer();
+  const comment = String(formData.get("comment") ?? "").trim();
+  const rating = Math.min(5, Math.max(1, Number(formData.get("rating") ?? 5) || 5));
+  if (!comment) return;
+
+  await prisma.review.create({
+    data: {
+      authorName: session.name ?? "Cliente",
+      comment,
+      rating,
+      isApproved: false, // el admin la aprueba antes de publicarla
+    },
+  });
+  revalidatePath("/cuenta");
 }

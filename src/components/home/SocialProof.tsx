@@ -1,24 +1,26 @@
 import { Star, Quote, ImageIcon, MessageSquare } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
+import { getApprovedReviews } from "@/lib/reviews";
 
 /**
  * Referencias + Calificaciones.
- * Estructura lista para integrar contenido real:
- *  - Testimonios / capturas de WhatsApp de clientes satisfechos.
- *  - Fotografías de trabajos realizados.
- *  - Calificaciones con estrellas.
- * Por ahora se muestran marcadores de posición elegantes.
+ * Muestra las reseñas aprobadas desde la base de datos (gestionadas en el panel).
+ * Si todavía no hay reseñas, cae a marcadores de posición elegantes.
  */
 
-// TODO: Reemplazar con testimonios reales del cliente.
-const testimonials = [
-  { name: "Cliente satisfecho", text: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
-  { name: "Cliente satisfecho", text: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
-  { name: "Cliente satisfecho", text: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
+// Marcadores de posición mientras no haya reseñas reales aprobadas.
+const placeholders = [
+  { authorName: "Cliente satisfecho", comment: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
+  { authorName: "Cliente satisfecho", comment: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
+  { authorName: "Cliente satisfecho", comment: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
 ];
 
-export function SocialProof() {
+export async function SocialProof() {
+  const { reviews, average, count } = await getApprovedReviews(6);
+  const testimonials = reviews.length > 0 ? reviews : placeholders;
+  const displayAvg = average != null ? average.toFixed(1) : "5.0";
+
   return (
     <section id="referencias" className="scroll-mt-24 py-20 md:py-28">
       <div className="container-app">
@@ -36,20 +38,24 @@ export function SocialProof() {
                 <Star key={i} className="h-6 w-6 fill-naranja text-naranja" />
               ))}
             </div>
-            <p className="font-display text-4xl font-semibold text-cloud">5.0</p>
-            <p className="text-sm text-mist">Calificación promedio · Opiniones verificadas próximamente</p>
+            <p className="font-display text-4xl font-semibold text-cloud">{displayAvg}</p>
+            <p className="text-sm text-mist">
+              {count > 0
+                ? `Calificación promedio · ${count} ${count === 1 ? "opinión" : "opiniones"}`
+                : "Calificación promedio · Opiniones verificadas próximamente"}
+            </p>
           </div>
         </Reveal>
 
-        {/* Testimonios (placeholder) */}
+        {/* Testimonios */}
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {testimonials.map((t, i) => (
             <Reveal key={i} delay={i * 0.08}>
               <figure className="card-premium h-full p-6">
                 <Quote className="h-7 w-7 text-morado-light/60" />
-                <blockquote className="mt-4 text-sm leading-relaxed text-mist">“{t.text}”</blockquote>
+                <blockquote className="mt-4 text-sm leading-relaxed text-mist">“{t.comment}”</blockquote>
                 <figcaption className="mt-5 flex items-center justify-between">
-                  <span className="text-sm font-medium text-cloud">{t.name}</span>
+                  <span className="text-sm font-medium text-cloud">{t.authorName}</span>
                   <span className="flex gap-0.5">
                     {Array.from({ length: t.rating }).map((_, s) => (
                       <Star key={s} className="h-3.5 w-3.5 fill-naranja text-naranja" />
