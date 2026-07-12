@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, Clock, MessageCircle, BadgeCheck, Image as ImageIcon, Play } from "lucide-react";
-import { getProductBySlug, productSlugs, products } from "@/lib/products";
+import { getCatalogProductBySlug, getCatalogProducts, getCatalogSlugs } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site-config";
 import { formatCOP } from "@/lib/utils";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
@@ -10,8 +10,9 @@ import { ProductMedia } from "@/components/catalog/ProductMedia";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function generateStaticParams() {
-  return productSlugs.map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  const slugs = await getCatalogSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -20,7 +21,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getCatalogProductBySlug(slug);
   if (!product) return { title: "Producto no encontrado" };
   return {
     title: product.name,
@@ -35,10 +36,11 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getCatalogProductBySlug(slug);
   if (!product) notFound();
 
-  const related = products.filter((p) => p.slug !== product.slug).slice(0, 3);
+  const all = await getCatalogProducts();
+  const related = all.filter((p) => p.slug !== product.slug).slice(0, 3);
 
   return (
     <div className="pt-28 md:pt-36">

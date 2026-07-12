@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageCircle, Loader2, CheckCircle2, Tag, Calculator } from "lucide-react";
 import { quoteSchema, type QuoteInput } from "@/lib/schemas";
-import { products } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import { formatCOP } from "@/lib/utils";
 import { buildWhatsAppUrl, quoteToWhatsAppMessage } from "@/lib/whatsapp";
 
@@ -16,7 +16,13 @@ const inputClass =
 const labelClass = "mb-1.5 block text-sm text-mist";
 const errClass = "mt-1 text-xs text-red-400";
 
-export function QuoteForm({ initialProduct }: { initialProduct?: string }) {
+export function QuoteForm({
+  initialProduct,
+  products,
+}: {
+  initialProduct?: string;
+  products: Pick<Product, "slug" | "name" | "pricePerMeter">[];
+}) {
   const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 

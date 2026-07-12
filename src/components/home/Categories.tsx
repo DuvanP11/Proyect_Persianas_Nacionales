@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { products } from "@/lib/products";
+import { getCatalogProducts } from "@/lib/catalog";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProductCard } from "@/components/catalog/ProductCard";
 
-export function Categories() {
+export async function Categories() {
+  const products = await getCatalogProducts();
   return (
     <section id="categorias" className="scroll-mt-24 py-20 md:py-28">
       <div className="container-app">

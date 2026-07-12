@@ -2,25 +2,31 @@
 
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { products } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 import { cn } from "@/lib/utils";
 
 type SortKey = "relevancia" | "precio-asc" | "precio-desc" | "tiempo";
 
-// Colores agregados para el filtro (derivados del catálogo)
-const allColors = Array.from(
-  new Map(products.flatMap((p) => p.colors).map((c) => [c.name, c])).values(),
-).sort((a, b) => a.name.localeCompare(b.name));
-
-const allMaterials = Array.from(new Set(products.map((p) => p.material))).sort();
-
-export function CatalogClient() {
+export function CatalogClient({ products }: { products: Product[] }) {
   const [query, setQuery] = useState("");
   const [color, setColor] = useState<string>("");
   const [material, setMaterial] = useState<string>("");
   const [sort, setSort] = useState<SortKey>("relevancia");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Colores y materiales agregados para los filtros (derivados del catálogo).
+  const allColors = useMemo(
+    () =>
+      Array.from(
+        new Map(products.flatMap((p) => p.colors).map((c) => [c.name, c])).values(),
+      ).sort((a, b) => a.name.localeCompare(b.name)),
+    [products],
+  );
+  const allMaterials = useMemo(
+    () => Array.from(new Set(products.map((p) => p.material))).sort(),
+    [products],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -58,7 +64,7 @@ export function CatalogClient() {
         break;
     }
     return list;
-  }, [query, color, material, sort]);
+  }, [products, query, color, material, sort]);
 
   const hasActiveFilters = color || material || query;
 

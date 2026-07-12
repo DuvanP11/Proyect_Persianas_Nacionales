@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
-import { productSlugs } from "@/lib/products";
+import { getCatalogSlugs } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site-config";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url;
   const now = new Date();
+  const slugs = await getCatalogSlugs();
 
   const staticRoutes = ["", "/catalogo", "/cotizar", "/como-medir"].map((path) => ({
     url: `${base}${path}`,
@@ -13,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.8,
   }));
 
-  const productRoutes = productSlugs.map((slug) => ({
+  const productRoutes = slugs.map((slug) => ({
     url: `${base}/catalogo/${slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

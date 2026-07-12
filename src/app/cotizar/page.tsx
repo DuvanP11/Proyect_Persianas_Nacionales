@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CheckCircle2, MessageCircle, ShieldCheck, Truck } from "lucide-react";
 import { QuoteForm } from "@/components/quote/QuoteForm";
+import { getCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Cotizar",
@@ -21,6 +22,7 @@ export default async function CotizarPage({
   searchParams: Promise<{ producto?: string }>;
 }) {
   const { producto } = await searchParams;
+  const products = await getCatalogProducts();
 
   return (
     <div className="pt-28 md:pt-36">
@@ -53,7 +55,7 @@ export default async function CotizarPage({
           </div>
 
           {/* Formulario */}
-          <QuoteForm initialProduct={producto} />
+          <QuoteForm initialProduct={producto} products={products} />
         </div>
       </div>
     </div>

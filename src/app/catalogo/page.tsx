@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CatalogClient } from "@/components/catalog/CatalogClient";
+import { getCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Catálogo",
@@ -7,7 +8,9 @@ export const metadata: Metadata = {
     "Explora el catálogo de cortinas y persianas de Cortinería Nacional: Blackout, Sheer Elegance, persianas motorizadas y más. Confección a la medida con instalación gratis.",
 };
 
-export default function CatalogoPage() {
+export default async function CatalogoPage() {
+  const products = await getCatalogProducts();
+
   return (
     <div className="pt-28 md:pt-36">
       <div className="container-app">
@@ -25,7 +28,7 @@ export default function CatalogoPage() {
           </p>
         </header>
 
-        <CatalogClient />
+        <CatalogClient products={products} />
       </div>
     </div>
   );
