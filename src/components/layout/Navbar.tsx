@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, MessageCircle } from "lucide-react";
+import { Menu, X, MessageCircle, User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "./Logo";
 import { siteConfig } from "@/lib/site-config";
@@ -55,6 +55,13 @@ export function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Link
+            href="/cuenta"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
+          >
+            <User className="h-4 w-4" />
+            Mi cuenta
+          </Link>
           <Button href="/cotizar" variant="outline" size="sm">
             Cotizar
           </Button>
@@ -102,6 +109,15 @@ export function Navbar() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/cuenta"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 text-base text-cloud transition-colors hover:bg-white/[0.05]"
+                >
+                  <User className="h-4 w-4" /> Mi cuenta
+                </Link>
+              </li>
               <li className="mt-2 flex gap-2 px-1">
                 <Button href="/cotizar" variant="outline" size="sm" className="flex-1" onClick={() => setOpen(false)}>
                   Cotizar

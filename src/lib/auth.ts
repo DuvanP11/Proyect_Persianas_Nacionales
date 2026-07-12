@@ -93,3 +93,12 @@ export async function requireAdmin(): Promise<Session> {
   }
   return session;
 }
+
+/** Gate para el portal del cliente. Redirige a /cuenta/ingresar si no hay sesión válida. */
+export async function requireCustomer(): Promise<Session> {
+  const session = await getSession();
+  if (!session) {
+    redirect("/cuenta/ingresar");
+  }
+  return session;
+}

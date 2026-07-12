@@ -32,13 +32,16 @@ async function persistQuote(data: unknown, code: string): Promise<boolean> {
   try {
     const { prisma } = await import("@/lib/prisma");
     const q = data as Record<string, unknown>;
+    const email = String(q.correo).toLowerCase();
+    // Si ya existe un cliente con ese correo, enlaza la cotización a su cuenta.
+    const customer = await prisma.customer.findFirst({ where: { email } });
     await prisma.quote.create({
       data: {
         code,
         firstName: String(q.nombre),
         lastName: String(q.apellidos),
         phone: String(q.telefono),
-        email: String(q.correo),
+        email,
         city: String(q.ciudad),
         address: String(q.direccion),
         productName: String(q.producto),
@@ -47,6 +50,7 @@ async function persistQuote(data: unknown, code: string): Promise<boolean> {
         comments: q.comentarios ? String(q.comentarios) : null,
         promoCode: q.tieneVolante ? (q.codigoPromo as string) ?? null : null,
         discountPct: q.tieneVolante && q.descuentoPct != null ? Number(q.descuentoPct) : null,
+        customerId: customer?.id ?? null,
       },
     });
     return true;
