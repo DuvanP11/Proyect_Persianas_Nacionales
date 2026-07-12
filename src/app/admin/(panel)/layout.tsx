@@ -8,6 +8,9 @@ const NAV = [
   { href: "/admin/pedidos", label: "Pedidos", icon: "◎" },
   { href: "/admin/productos", label: "Productos", icon: "◫" },
   { href: "/admin/categorias", label: "Categorías", icon: "▤" },
+  { href: "/admin/resenas", label: "Reseñas", icon: "★" },
+  { href: "/admin/promociones", label: "Promociones", icon: "%" },
+  { href: "/admin/inventario", label: "Inventario", icon: "▧" },
 ];
 
 export default async function PanelLayout({

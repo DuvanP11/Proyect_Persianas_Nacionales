@@ -9,10 +9,12 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "seed:admin": "node --env-file=.env scripts/seed-admin.mjs",
-    "seed:products": "node --env-file=.env scripts/seed-products.mts"
+    "seed:products": "node --env-file=.env scripts/seed-products.mts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@prisma/client": "^6.19.3",
     "clsx": "^2.1.1",
     "lucide-react": "^1.24.0",
     "motion": "^12.42.2",
@@ -24,7 +26,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
