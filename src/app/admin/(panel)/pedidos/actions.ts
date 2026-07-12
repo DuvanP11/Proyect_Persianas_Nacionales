@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { ORDER_STATUSES, type OrderStatus } from "@/lib/order-status";
@@ -31,4 +32,28 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
   revalidatePath(`/admin/pedidos/${id}`);
   revalidatePath("/admin");
   revalidatePath("/cuenta");
+}
+
+/** Genera una remisión/factura para el pedido con un monto y redirige a imprimirla. */
+export async function generateInvoice(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const orderId = String(formData.get("orderId") ?? "");
+  const amount = Math.max(0, Math.round(Number(formData.get("amount") ?? 0) || 0));
+  if (!orderId) return;
+
+  const count = await prisma.invoice.count();
+  const number = `REM-${String(count + 1).padStart(5, "0")}`;
+
+  const invoice = await prisma.invoice.create({
+    data: { number, orderId, amount },
+  });
+
+  // Si el pedido no tenía total, se guarda el de la remisión.
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { total: amount },
+  });
+
+  revalidatePath(`/admin/pedidos/${orderId}`);
+  redirect(`/admin/facturas/${invoice.id}`);
 }

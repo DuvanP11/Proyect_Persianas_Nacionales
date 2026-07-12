@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { updateOrderStatus } from "../actions";
+import { updateOrderStatus, generateInvoice } from "../actions";
 import { ORDER_STATUSES, ORDER_META } from "@/lib/order-status";
+import { formatCOP } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,7 @@ export default async function PedidoDetallePage({
       customer: true,
       quote: true,
       history: { orderBy: { createdAt: "desc" } },
+      invoices: { orderBy: { createdAt: "desc" } },
     },
   });
   if (!order) notFound();
@@ -106,6 +108,42 @@ export default async function PedidoDetallePage({
                 className="rounded-full bg-gradient-to-r from-morado to-naranja px-5 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5"
               >
                 Guardar estado
+              </button>
+            </form>
+          </div>
+
+          {/* Facturación */}
+          <div className="rounded-2xl border border-line bg-surface/60 p-5">
+            <h2 className="mb-3 font-display text-lg text-cloud">Remisión / factura</h2>
+            {order.invoices.length > 0 && (
+              <ul className="mb-3 space-y-2">
+                {order.invoices.map((inv) => (
+                  <li key={inv.id} className="flex items-center justify-between gap-3 rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm">
+                    <span className="font-mono text-morado-light">{inv.number}</span>
+                    <span className="text-cloud">{formatCOP(inv.amount)}</span>
+                    <a
+                      href={`/admin/facturas/${inv.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-md border border-line px-2.5 py-1 text-xs text-mist transition hover:border-morado hover:text-cloud"
+                    >
+                      Ver / imprimir
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <form action={generateInvoice} className="flex gap-2">
+              <input type="hidden" name="orderId" value={order.id} />
+              <input
+                name="amount"
+                inputMode="numeric"
+                placeholder="Monto total (COP)"
+                defaultValue={order.total || ""}
+                className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm text-cloud outline-none focus:border-morado"
+              />
+              <button className="shrink-0 rounded-full border border-morado/50 px-4 py-2 text-sm text-morado-light transition hover:bg-morado/10">
+                Generar
               </button>
             </form>
           </div>

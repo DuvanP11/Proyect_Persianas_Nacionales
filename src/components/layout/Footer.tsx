@@ -47,7 +47,7 @@ const legal = [
 
 export function Footer() {
   return (
-    <footer id="contacto" className="relative mt-24 border-t border-line/60 bg-ink-soft/60">
+    <footer id="contacto" className="relative mt-24 border-t border-line/60 bg-ink-soft/60 print:hidden">
       <div className="container-app py-16">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.1fr]">
           {/* Marca + descripción */}
