@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { Ruler, ArrowRight, MoveHorizontal, MoveVertical } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { DiagramAncho, DiagramAlto } from "@/components/como-medir/MeasureDiagrams";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -96,34 +96,22 @@ export default function ComoMedirPage() {
         <section className="mt-14">
           <h2 className="font-display text-2xl font-semibold text-cloud">Diagramas de referencia</h2>
           <p className="mt-2 max-w-2xl text-sm text-mist">
-            Ilustraciones oficiales de medición según el tipo de ventana.
+            Así se toman las dos medidas clave de cada ventana.
           </p>
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
             <Reveal>
-              <figure className="overflow-hidden rounded-3xl border border-line bg-white p-3">
-                <Image
-                  src="/como-medir/tutorial-1.jpg"
-                  alt="Cómo medir ventanas que no van hasta el piso — ancho y alto"
-                  width={1500}
-                  height={844}
-                  className="h-auto w-full rounded-2xl"
-                />
-                <figcaption className="px-2 py-3 text-center text-xs text-neutral-500">
-                  Ventanas que no van hasta el piso
+              <figure className="rounded-3xl border border-line bg-surface/40 p-5">
+                <DiagramAncho />
+                <figcaption className="mt-3 text-center text-xs text-mist">
+                  Mide de un extremo a otro y suma la holgura según el tipo de ventana.
                 </figcaption>
               </figure>
             </Reveal>
             <Reveal delay={0.08}>
-              <figure className="overflow-hidden rounded-3xl border border-line bg-white p-3">
-                <Image
-                  src="/como-medir/tutorial-2.jpg"
-                  alt="Cómo medir ventanas que van hasta el piso"
-                  width={962}
-                  height={1255}
-                  className="mx-auto h-auto w-full max-w-md rounded-2xl"
-                />
-                <figcaption className="px-2 py-3 text-center text-xs text-neutral-500">
-                  Ventanas que van hasta el piso
+              <figure className="rounded-3xl border border-line bg-surface/40 p-5">
+                <DiagramAlto />
+                <figcaption className="mt-3 text-center text-xs text-mist">
+                  Mide la altura; suma para el soporte o resta 3 cm si va hasta el piso.
                 </figcaption>
               </figure>
             </Reveal>
