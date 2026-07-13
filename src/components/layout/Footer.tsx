@@ -174,7 +174,7 @@ export function Footer() {
               </span>
               <div>
                 <p className="text-xs uppercase tracking-wider text-mist-2">Para clientes</p>
-                <p className="font-display text-base font-semibold text-cloud">Mi cuenta</p>
+                <p className="font-display text-base font-semibold text-cloud">Ingreso Cliente</p>
                 <p className="text-xs text-mist">Ingresa o regístrate para ver tus cotizaciones y pedidos.</p>
               </div>
             </div>
@@ -191,7 +191,7 @@ export function Footer() {
               </span>
               <div>
                 <p className="text-xs uppercase tracking-wider text-mist-2">Para el equipo</p>
-                <p className="font-display text-base font-semibold text-cloud">Panel administrativo</p>
+                <p className="font-display text-base font-semibold text-cloud">Admin</p>
                 <p className="text-xs text-mist">Acceso del personal a productos, pedidos e inventario.</p>
               </div>
             </div>

@@ -9,8 +9,9 @@ import {
   useTransform,
   useReducedMotion,
 } from "motion/react";
-import { MessageCircle, ArrowRight, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
@@ -123,7 +124,7 @@ export function Hero() {
               Solicitar cotización gratis <ArrowRight className="h-4 w-4" />
             </Button>
             <Button href={buildWhatsAppUrl(quickQuoteMessage())} external variant="whatsapp" size="lg">
-              <MessageCircle className="h-5 w-5" />
+              <WhatsAppIcon className="h-5 w-5" />
               WhatsApp
             </Button>
           </motion.div>

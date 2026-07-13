@@ -40,11 +40,23 @@ export function About() {
                 <Building2 className="h-6 w-6" />
               </div>
               <h3 className="mt-5 font-display text-2xl font-semibold text-cloud">Nuestra historia</h3>
-              <p className="mt-4 leading-relaxed text-mist">
-                En Cortinería Nacional convertimos la tela en soluciones que embellecen y transforman
-                cada espacio. Trabajamos con dedicación artesanal y estándares profesionales para que
-                tus ventanas hablen de tu buen gusto.
-              </p>
+              <div className="mt-4 space-y-4 leading-relaxed text-mist">
+                <p>
+                  En Cortinería Nacional nos especializamos en la venta de persianas y cortinas a la
+                  medida de tus necesidades y estilo. Contamos con una amplia variedad de diseños,
+                  colores y materiales para que encuentres la opción ideal para tu hogar u oficina.
+                </p>
+                <p>
+                  Nuestro compromiso es brindarte una atención cercana y una asesoría personalizada
+                  desde el primer contacto, ayudándote a elegir la mejor alternativa para crear
+                  espacios más cómodos, elegantes y funcionales.
+                </p>
+                <p>
+                  Trabajamos con productos de excelente calidad, garantía en nuestros productos e
+                  instalación, y materiales diseñados para ofrecer durabilidad y un excelente
+                  desempeño con el paso del tiempo. Tu satisfacción es nuestra mayor prioridad.
+                </p>
+              </div>
               <ul className="mt-6 grid gap-3 sm:grid-cols-2">
                 {[
                   "Fabricación propia",

@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, MessageCircle, User } from "lucide-react";
+import { Menu, X, User, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { Logo } from "./Logo";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
@@ -65,7 +66,14 @@ export function Navbar() {
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
           >
             <User className="h-4 w-4" />
-            Mi cuenta
+            Ingreso Cliente
+          </Link>
+          <Link
+            href="/admin/login"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
+          >
+            <Lock className="h-3.5 w-3.5" />
+            Admin
           </Link>
           <Button href="/cotizar" variant="outline" size="sm">
             Cotizar
@@ -76,7 +84,7 @@ export function Navbar() {
             variant="whatsapp"
             size="sm"
           >
-            <MessageCircle className="h-4 w-4" />
+            <WhatsAppIcon className="h-4 w-4" />
             WhatsApp
           </Button>
         </div>
@@ -120,7 +128,16 @@ export function Navbar() {
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-2 rounded-xl px-4 py-3 text-base text-cloud transition-colors hover:bg-white/[0.05]"
                 >
-                  <User className="h-4 w-4" /> Mi cuenta
+                  <User className="h-4 w-4" /> Ingreso Cliente
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/login"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 text-base text-mist transition-colors hover:bg-white/[0.05]"
+                >
+                  <Lock className="h-4 w-4" /> Admin
                 </Link>
               </li>
               <li className="mt-2 flex gap-2 px-1">
@@ -134,7 +151,7 @@ export function Navbar() {
                   size="sm"
                   className="flex-1"
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <WhatsAppIcon className="h-4 w-4" />
                   WhatsApp
                 </Button>
               </li>
