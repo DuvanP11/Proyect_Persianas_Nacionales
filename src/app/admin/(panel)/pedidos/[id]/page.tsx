@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { updateOrderStatus, generateInvoice } from "../actions";
 import { ORDER_STATUSES, ORDER_META } from "@/lib/order-status";
+import { OrderTimeline } from "@/components/order/OrderTimeline";
 import { formatCOP } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +28,15 @@ export default async function PedidoDetallePage({
 
   const m = ORDER_META[order.status] ?? ORDER_META.RECIBIDO;
 
+  // URL absoluta del sitio (para compartir el enlace de la remisión).
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const base = host ? `${proto}://${host}` : "";
+
+  const waDigits = order.customer.phone.replace(/\D/g, "");
+  const waFull = waDigits.startsWith("57") ? waDigits : `57${waDigits}`;
+
   return (
     <div className="space-y-6">
       <div>
@@ -36,6 +47,11 @@ export default async function PedidoDetallePage({
           <h1 className="font-display text-3xl text-cloud">Pedido {order.code}</h1>
           <span className={`rounded-full px-3 py-1 text-sm ${m.cls}`}>{m.text}</span>
         </div>
+      </div>
+
+      {/* Línea de tiempo del pedido */}
+      <div className="rounded-2xl border border-line bg-surface/60 p-5">
+        <OrderTimeline status={order.status} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
@@ -117,20 +133,45 @@ export default async function PedidoDetallePage({
             <h2 className="mb-3 font-display text-lg text-cloud">Remisión / factura</h2>
             {order.invoices.length > 0 && (
               <ul className="mb-3 space-y-2">
-                {order.invoices.map((inv) => (
-                  <li key={inv.id} className="flex items-center justify-between gap-3 rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm">
-                    <span className="font-mono text-morado-light">{inv.number}</span>
-                    <span className="text-cloud">{formatCOP(inv.amount)}</span>
-                    <a
-                      href={`/admin/facturas/${inv.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-md border border-line px-2.5 py-1 text-xs text-mist transition hover:border-morado hover:text-cloud"
-                    >
-                      Ver / imprimir
-                    </a>
-                  </li>
-                ))}
+                {order.invoices.map((inv) => {
+                  const link = `${base}/factura/${inv.id}`;
+                  const msg = `Hola ${order.customer.firstName}, aquí está tu remisión ${inv.number} de Cortinería Nacional por ${formatCOP(inv.amount)}: ${link}`;
+                  const wa = `https://wa.me/${waFull}?text=${encodeURIComponent(msg)}`;
+                  const mail = `mailto:${order.customer.email}?subject=${encodeURIComponent(`Remisión ${inv.number} — Cortinería Nacional`)}&body=${encodeURIComponent(msg)}`;
+                  return (
+                    <li key={inv.id} className="rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-mono text-morado-light">{inv.number}</span>
+                        <span className="text-cloud">{formatCOP(inv.amount)}</span>
+                        <a
+                          href={`/admin/facturas/${inv.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-md border border-line px-2.5 py-1 text-xs text-mist transition hover:border-morado hover:text-cloud"
+                        >
+                          Ver / imprimir
+                        </a>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-2 border-t border-line pt-2">
+                        <span className="text-xs text-mist-2">Compartir con el cliente:</span>
+                        <a
+                          href={wa}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-md bg-[#25D366]/15 px-2.5 py-1 text-xs text-emerald-300 transition hover:bg-[#25D366]/25"
+                        >
+                          WhatsApp
+                        </a>
+                        <a
+                          href={mail}
+                          className="rounded-md bg-morado/15 px-2.5 py-1 text-xs text-morado-light transition hover:bg-morado/25"
+                        >
+                          Correo
+                        </a>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             )}
             <form action={generateInvoice} className="flex gap-2">

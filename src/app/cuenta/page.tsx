@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_META } from "@/lib/order-status";
+import { OrderTimeline } from "@/components/order/OrderTimeline";
 import { logoutCustomer, submitReview } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,10 @@ export default async function CuentaPage() {
       ? prisma.order.findMany({
           where: { customerId: customer.id },
           orderBy: { createdAt: "desc" },
-          include: { history: { orderBy: { createdAt: "desc" }, take: 1 } },
+          include: {
+            history: { orderBy: { createdAt: "desc" }, take: 1 },
+            invoices: { orderBy: { createdAt: "desc" } },
+          },
         })
       : Promise.resolve([]),
   ]);
@@ -126,20 +130,42 @@ export default async function CuentaPage() {
               Aún no tienes pedidos en proceso. Cuando una cotización se convierta en pedido, podrás seguir su estado aquí.
             </div>
           ) : (
-            <ul className="mt-6 space-y-3">
+            <ul className="mt-6 space-y-4">
               {orders.map((o) => {
                 const m = ORDER_META[o.status] ?? ORDER_META.RECIBIDO;
                 const last = o.history[0];
                 return (
-                  <li key={o.id} className="flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface/60 p-5">
-                    <div>
-                      <p className="font-mono text-xs text-morado-light">{o.code}</p>
-                      <p className="text-xs text-mist-2">
-                        Pedido del {new Date(o.createdAt).toLocaleDateString("es-CO")}
-                      </p>
-                      {last?.note && <p className="mt-1 text-xs text-mist">{last.note}</p>}
+                  <li key={o.id} className="rounded-2xl border border-line bg-surface/60 p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="font-mono text-xs text-morado-light">{o.code}</p>
+                        <p className="text-xs text-mist-2">
+                          Pedido del {new Date(o.createdAt).toLocaleDateString("es-CO")}
+                        </p>
+                        {last?.note && <p className="mt-1 text-xs text-mist">{last.note}</p>}
+                      </div>
+                      <span className={`shrink-0 rounded-full px-3 py-1 text-sm ${m.cls}`}>{m.text}</span>
                     </div>
-                    <span className={`shrink-0 rounded-full px-3 py-1 text-sm ${m.cls}`}>{m.text}</span>
+                    {/* Seguimiento visual del pedido */}
+                    <div className="mt-5 border-t border-line pt-5">
+                      <OrderTimeline status={o.status} />
+                    </div>
+                    {o.invoices.length > 0 && (
+                      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+                        <span className="text-xs text-mist-2">Remisiones:</span>
+                        {o.invoices.map((inv) => (
+                          <a
+                            key={inv.id}
+                            href={`/factura/${inv.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-md border border-line px-2.5 py-1 text-xs text-morado-light transition hover:border-morado hover:text-cloud"
+                          >
+                            {inv.number} · ver
+                          </a>
+                        ))}
+                      </div>
+                    )}
                   </li>
                 );
               })}
