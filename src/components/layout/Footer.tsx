@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MapPin, Phone, Clock, Mail, User, Lock, ArrowRight } from "lucide-react";
 
 // Iconos de marca (lucide v1 los removió) — SVG inline.
@@ -46,6 +49,10 @@ const legal = [
 ];
 
 export function Footer() {
+  const pathname = usePathname();
+  // El panel de administración no muestra el footer público.
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <footer id="contacto" className="relative mt-24 border-t border-line/60 bg-ink-soft/60 print:hidden">
       <div className="container-app py-16">

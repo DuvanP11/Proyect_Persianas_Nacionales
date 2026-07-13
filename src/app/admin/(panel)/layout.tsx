@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 import { requireAdmin } from "@/lib/auth";
 import { logoutAction } from "./actions";
 
@@ -21,9 +23,18 @@ export default async function PanelLayout({
   const session = await requireAdmin();
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:px-6">
-      <aside className="md:w-56 md:shrink-0">
-        <div className="rounded-2xl border border-line bg-surface/60 p-4">
+    <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8 md:flex-row md:px-6">
+      <aside className="md:w-60 md:shrink-0">
+        <div className="rounded-2xl border border-line bg-surface/60 p-4 md:sticky md:top-6">
+          <div className="px-1 pb-3">
+            <Logo />
+          </div>
+          <Link
+            href="/"
+            className="mb-3 flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs text-mist transition hover:border-morado/50 hover:text-cloud"
+          >
+            <ArrowUpRight className="h-3.5 w-3.5" /> Ver sitio público
+          </Link>
           <p className="px-2 text-xs font-medium uppercase tracking-widest text-naranja">
             Panel
           </p>
