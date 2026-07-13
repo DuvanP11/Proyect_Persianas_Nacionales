@@ -33,10 +33,10 @@ export const siteConfig = {
 
   schedule: "Lunes a Sábado, 9:00 a.m. a 6:00 p.m.",
 
-  // Redes sociales (dejar '#' hasta tener los enlaces oficiales)
+  // Redes sociales
   social: {
-    facebook: "#",
-    instagram: "#",
+    facebook: "https://www.facebook.com/share/1GgcemyYh6/",
+    instagram: "https://www.instagram.com/cortinerianacional",
   },
 
   // URL pública del sitio (para SEO / Open Graph). Ajustar al dominio real.
