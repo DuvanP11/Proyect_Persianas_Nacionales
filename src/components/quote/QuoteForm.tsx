@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageCircle, Loader2, CheckCircle2, Tag, Calculator } from "lucide-react";
+import { Loader2, CheckCircle2, Tag, Calculator } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { quoteSchema, type QuoteInput } from "@/lib/schemas";
 import type { Product } from "@/lib/products";
 import { formatCOP } from "@/lib/utils";
@@ -317,7 +318,7 @@ export function QuoteForm({
           </>
         ) : (
           <>
-            <MessageCircle className="h-5 w-5" /> Enviar cotización por WhatsApp
+            <WhatsAppIcon className="h-5 w-5" /> Enviar cotización por WhatsApp
           </>
         )}
       </button>

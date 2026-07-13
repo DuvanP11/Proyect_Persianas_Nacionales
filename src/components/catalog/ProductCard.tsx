@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MessageCircle, ArrowRight, BadgeCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import type { Product } from "@/lib/products";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
@@ -76,7 +77,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
             aria-label={`Contactar por WhatsApp sobre ${product.name}`}
             className="inline-flex items-center justify-center rounded-full border border-line px-3.5 py-2.5 text-[#25D366] transition-all hover:-translate-y-0.5 hover:border-[#25D366]/50 hover:bg-[#25D366]/10"
           >
-            <MessageCircle className="h-4 w-4" />
+            <WhatsAppIcon className="h-4 w-4" />
           </a>
         </div>
 

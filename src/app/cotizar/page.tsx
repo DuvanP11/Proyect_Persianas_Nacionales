@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { CheckCircle2, MessageCircle, ShieldCheck, Truck } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { QuoteForm } from "@/components/quote/QuoteForm";
 import { getCatalogProducts } from "@/lib/catalog";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const perks = [
-  { icon: MessageCircle, text: "Respuesta rápida por WhatsApp" },
+  { icon: WhatsAppIcon, text: "Respuesta rápida por WhatsApp" },
   { icon: Truck, text: "Toma de medidas a domicilio" },
   { icon: ShieldCheck, text: "Materiales de alta calidad" },
   { icon: CheckCircle2, text: "Instalación totalmente gratis" },

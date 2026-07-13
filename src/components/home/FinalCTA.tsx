@@ -1,5 +1,6 @@
-import { MessageCircle, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { Reveal } from "@/components/ui/Reveal";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
@@ -22,7 +23,7 @@ export function FinalCTA() {
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
                 <Button href={buildWhatsAppUrl(quickQuoteMessage())} external variant="whatsapp" size="lg">
-                  <MessageCircle className="h-5 w-5" />
+                  <WhatsAppIcon className="h-5 w-5" />
                   Cotizar por WhatsApp
                 </Button>
                 <Button href="/cotizar" variant="outline" size="lg">

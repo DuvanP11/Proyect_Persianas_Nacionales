@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, Phone, Clock, Mail, User, Lock, ArrowRight } from "lucide-react";
+import { MapPin, Clock, Mail, User, Lock, ArrowRight } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 
 // Iconos de marca (lucide v1 los removió) — SVG inline.
 function FacebookIcon({ className }: { className?: string }) {
@@ -130,7 +131,7 @@ export function Footer() {
                 </span>
               </li>
               <li className="flex gap-3">
-                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-morado-light" />
+                <WhatsAppIcon className="mt-0.5 h-4 w-4 shrink-0 text-morado-light" />
                 <a href={buildWhatsAppUrl(quickQuoteMessage())} target="_blank" rel="noopener noreferrer" className="hover:text-cloud">
                   WhatsApp: {siteConfig.whatsapp.display}
                 </a>

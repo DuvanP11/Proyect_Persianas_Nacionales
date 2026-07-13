@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Clock, MessageCircle, BadgeCheck } from "lucide-react";
+import { ArrowLeft, Check, Clock, BadgeCheck } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { getCatalogProductBySlug, getCatalogProducts, getCatalogSlugs } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site-config";
 import { formatCOP } from "@/lib/utils";
@@ -139,7 +140,7 @@ export default async function ProductPage({
                 rel="noopener noreferrer"
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-medium text-white shadow-lg shadow-[#25D366]/25 transition-all hover:-translate-y-0.5 hover:brightness-110"
               >
-                <MessageCircle className="h-4 w-4" /> WhatsApp
+                <WhatsAppIcon className="h-4 w-4" /> WhatsApp
               </a>
             </div>
 
