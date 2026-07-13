@@ -10,27 +10,29 @@ import { cn } from "@/lib/utils";
  * Como `--color-cloud` es el color de primer plano del tema, la letra es:
  *   · tema oscuro (actual)  → blanca
  *   · tema claro (si se agrega, redefiniendo el token) → negra
- * El ícono es morado en ambos casos (color de acento de la marca).
+ * El ícono es la placa oscura de marca con lamas claras (logo de la empresa).
  */
 function BlindsMark({ className }: { className?: string }) {
-  // Lamas como paralelogramos inclinados (top desplazado a la derecha).
+  // Lamas claras como paralelogramos inclinados dentro de la placa oscura.
   const slat = (top: number) => {
-    const X = 11.5, W = 18.5, H = 4.4, SKEW = 3, Yb = top + H;
+    const X = 11, W = 22, H = 4.4, SKEW = 3, Yb = top + H;
     return `${X},${Yb} ${X + SKEW},${top} ${X + W + SKEW},${top} ${X + W},${Yb}`;
   };
-  const AUBERGINE = "#3f2a5c";
+  const SLAT = "#ede8fb";
   return (
     <svg viewBox="0 0 48 48" className={className} role="img" aria-hidden="true">
-      {/* Placa circular */}
-      <circle cx="24" cy="24" r="23" fill="#ffffff" stroke="#241a33" strokeWidth="1.5" />
-      {/* Lamas de la persiana */}
-      {[12.8, 19, 25.2, 31.4].map((top) => (
-        <polygon key={top} points={slat(top)} fill={AUBERGINE} />
+      <defs>
+        <linearGradient id="cn-badge" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#5a3b8c" />
+          <stop offset="1" stopColor="#2c1b44" />
+        </linearGradient>
+      </defs>
+      {/* Placa redondeada oscura */}
+      <rect x="3" y="3" width="42" height="42" rx="12" fill="url(#cn-badge)" />
+      {/* Lamas claras */}
+      {[12.5, 20, 27.5, 35].map((top) => (
+        <polygon key={top} points={slat(top)} fill={SLAT} />
       ))}
-      {/* Asta */}
-      <rect x="33.6" y="11" width="1.8" height="25" rx="0.9" fill={AUBERGINE} />
-      {/* Base / pesa */}
-      <path d="M32.9 35.8 L35.9 35.8 L35.1 38.4 L34.4 39.6 L33.7 38.4 Z" fill={AUBERGINE} />
     </svg>
   );
 }

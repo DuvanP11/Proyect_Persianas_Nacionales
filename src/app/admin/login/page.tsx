@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { loginAction, type LoginState } from "./actions";
 
 const initial: LoginState = {};
@@ -41,14 +42,12 @@ export default function LoginPage() {
             <label htmlFor="password" className="mb-1.5 block text-sm text-mist">
               Contraseña
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               autoComplete="current-password"
               required
               className="w-full rounded-lg border border-line bg-ink px-4 py-2.5 text-cloud outline-none transition focus:border-morado"
-              placeholder="••••••••"
             />
           </div>
 

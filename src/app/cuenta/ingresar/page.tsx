@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { loginCustomer, type AuthState } from "../actions";
 
 const initial: AuthState = {};
@@ -25,7 +26,7 @@ export default function IngresarPage() {
           </div>
           <div>
             <label htmlFor="password" className="mb-1.5 block text-sm text-mist">Contraseña</label>
-            <input id="password" name="password" type="password" autoComplete="current-password" required className={input} placeholder="••••••••" />
+            <PasswordInput id="password" name="password" autoComplete="current-password" required className={input} />
           </div>
 
           {state.error && (

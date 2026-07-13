@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { registerCustomer, type AuthState } from "../actions";
 
 const initial: AuthState = {};
@@ -40,7 +41,7 @@ export default function RegistroPage() {
           </div>
           <div>
             <label htmlFor="password" className={label}>Contraseña</label>
-            <input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} className={input} placeholder="Mínimo 8 caracteres" />
+            <PasswordInput id="password" name="password" autoComplete="new-password" required minLength={8} className={input} placeholder="Mínimo 8 caracteres" />
           </div>
 
           {state.error && (
