@@ -117,15 +117,23 @@ export default async function CotizacionesPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <a
-                      href={waLink(q.phone, q.code)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-md bg-emerald-600/20 px-2.5 py-1 text-xs text-emerald-300 transition hover:bg-emerald-600/30"
-                    >
-                      WhatsApp
-                    </a>
-                    <span className="block text-xs text-mist-2">{q.phone}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <a
+                        href={waLink(q.phone, q.code)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-md bg-emerald-600/20 px-2.5 py-1 text-xs text-emerald-300 transition hover:bg-emerald-600/30"
+                      >
+                        WhatsApp
+                      </a>
+                      <a
+                        href={`mailto:${q.email}?subject=${encodeURIComponent(`Tu cotización ${q.code} — Cortinería Nacional`)}&body=${encodeURIComponent(`Hola ${q.firstName}, le escribimos de Cortinería Nacional respecto a su cotización ${q.code} (${q.productName}).`)}`}
+                        className="rounded-md bg-morado/15 px-2.5 py-1 text-xs text-morado-light transition hover:bg-morado/25"
+                      >
+                        Correo
+                      </a>
+                    </div>
+                    <span className="mt-1 block text-xs text-mist-2">{q.phone}</span>
                   </td>
                 </tr>
               ))}
