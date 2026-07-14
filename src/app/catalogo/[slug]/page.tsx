@@ -10,6 +10,7 @@ import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductConfigurator } from "@/components/catalog/ProductConfigurator";
+import { PaymentMethods } from "@/components/ui/PaymentMethods";
 import { Reveal } from "@/components/ui/Reveal";
 
 export async function generateStaticParams() {
@@ -162,6 +163,11 @@ export default async function ProductPage({
             {/* Instalación gratis */}
             <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-naranja/25 bg-naranja/[0.07] py-3 text-sm font-medium text-naranja-light">
               <BadgeCheck className="h-5 w-5" /> {siteConfig.freeInstall}
+            </div>
+
+            {/* Medios de pago para este pedido */}
+            <div className="mt-4 rounded-2xl border border-line bg-white/[0.02] p-5">
+              <PaymentMethods variant="compact" />
             </div>
           </div>
         </div>

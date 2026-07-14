@@ -10,12 +10,15 @@ export function buildWhatsAppUrl(message: string): string {
   return `https://wa.me/${siteConfig.whatsapp.number}?text=${text}`;
 }
 
-/** Mensaje genérico para el botón principal "Cotizar ahora". */
+/**
+ * Mensaje genérico para el botón principal "Cotizar ahora".
+ * Sin emojis: algunas versiones de WhatsApp los muestran como rombos (◈).
+ */
 export function quickQuoteMessage(productName?: string): string {
-  const base = `¡Hola *${siteConfig.name}*! 👋 Me gustaría cotizar`;
+  const base = `Hola, *${siteConfig.name}*. Me gustaría cotizar`;
   return productName
     ? `${base} *${productName}*. ¿Me pueden asesorar?`
-    : `${base} cortinas / persianas para mi espacio. ¿Me pueden asesorar?`;
+    : `${base} cortinas y persianas para mi espacio. ¿Me pueden asesorar?`;
 }
 
 export interface QuotePayload {

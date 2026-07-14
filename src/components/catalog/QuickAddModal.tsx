@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { ShoppingBag, X } from "lucide-react";
 import { ProductConfigurator } from "./ProductConfigurator";
+import { PaymentMethods } from "@/components/ui/PaymentMethods";
 import type { Product } from "@/lib/products";
 
 /**
@@ -114,6 +115,10 @@ function ConfigModal({
 
             <div className="mt-5">
               <ProductConfigurator product={product} variant="compact" />
+            </div>
+
+            <div className="mt-4 border-t border-line pt-4">
+              <PaymentMethods variant="compact" />
             </div>
           </motion.div>
         </motion.div>

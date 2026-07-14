@@ -103,26 +103,30 @@ export function cartCount(items: CartItem[]): number {
 /**
  * Arma el mensaje de WhatsApp con todo el carrito, listo para enviar.
  * Solo texto plano con negritas (*así*) para que se vea igual en cualquier
- * dispositivo, siguiendo el mismo criterio que el resto del sitio.
+ * dispositivo. SIN emojis: algunas versiones de WhatsApp los muestran como
+ * rombos (◈), lo que se ve poco profesional para la empresa.
  */
 export function cartToWhatsAppMessage(items: CartItem[]): string {
+  const total = cartCount(items);
   const lines: string[] = [
-    `Hola *${siteConfig.name}* 👋, estoy interesado en los siguientes productos:`,
+    `Hola, *${siteConfig.name}*.`,
+    `Estoy interesado(a) en cotizar los siguientes productos:`,
     "",
   ];
 
   items.forEach((it, i) => {
-    lines.push(`*Producto ${i + 1}:*`);
-    lines.push(`• Nombre: ${it.name}`);
-    lines.push(`• Diseño: ${it.design}`);
-    lines.push(`• Color: ${it.color}`);
-    lines.push(`• Tela: ${it.fabric}`);
-    lines.push(`• Cantidad: ${it.quantity}`);
-    lines.push(`• Metros: ${formatMeters(it.meters)}`);
+    lines.push(`*${i + 1}) ${it.name}*`);
+    lines.push(`   - Diseño: ${it.design}`);
+    lines.push(`   - Color: ${it.color}`);
+    lines.push(`   - Tela: ${it.fabric}`);
+    lines.push(`   - Cantidad: ${it.quantity}`);
+    lines.push(`   - Metros: ${formatMeters(it.meters)} m`);
     lines.push("");
   });
 
-  lines.push("Gracias. Quedo atento a la cotización.");
+  lines.push(`*Total de artículos:* ${total}`);
+  lines.push("");
+  lines.push("Quedo atento(a) a la cotización. ¡Gracias!");
   return lines.join("\n");
 }
 

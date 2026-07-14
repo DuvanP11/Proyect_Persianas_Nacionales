@@ -23,6 +23,7 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 import { Logo } from "./Logo";
+import { PaymentMethods } from "@/components/ui/PaymentMethods";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
@@ -148,6 +149,11 @@ export function Footer() {
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Medios de pago */}
+        <div className="mt-12 rounded-2xl border border-line/60 bg-surface/40 p-6">
+          <PaymentMethods variant="full" />
         </div>
 
         {/* Mapa */}

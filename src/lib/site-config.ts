@@ -11,7 +11,7 @@ export const siteConfig = {
   slogan: "De la máquina a tu puerta",
   description:
     "Venta y confección de cortinas y persianas en diferentes diseños, materiales y colores. Creamos espacios elegantes y funcionales para hogares y empresas.",
-  tagline: "Que tus ventanas hablen de tu buen gusto. 🪟",
+  tagline: "Que tus ventanas hablen de tu buen gusto.",
 
   // Contacto
   whatsapp: {
@@ -44,6 +44,20 @@ export const siteConfig = {
 
   // Beneficio destacado que aparece en cada producto
   freeInstall: "Instalación totalmente GRATIS",
+
+  // Medios de pago aceptados. Se muestran en el footer y en cada producto.
+  // `id` mapea al icono en el componente <PaymentMethods>. Ajusta esta lista
+  // según los medios reales de la empresa.
+  payments: {
+    note: "Anticipo para pedidos a la medida y pago contra entrega en Bogotá.",
+    methods: [
+      { id: "efectivo", label: "Efectivo" },
+      { id: "transferencia", label: "Transferencia bancaria" },
+      { id: "billetera", label: "Nequi / Daviplata" },
+      { id: "tarjeta", label: "Tarjetas débito y crédito" },
+      { id: "pse", label: "PSE" },
+    ],
+  },
 
   // Mostrar precios al público. Ponlo en `true` para volver a mostrarlos en la
   // ficha del producto y el estimado del formulario de cotización.
