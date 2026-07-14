@@ -49,13 +49,12 @@ export const siteConfig = {
   // `id` mapea al icono en el componente <PaymentMethods>. Ajusta esta lista
   // según los medios reales de la empresa.
   payments: {
-    note: "Anticipo para pedidos a la medida y pago contra entrega en Bogotá.",
+    note: "Elige tu medio de pago preferido al confirmar la cotización.",
     methods: [
-      { id: "efectivo", label: "Efectivo" },
-      { id: "transferencia", label: "Transferencia bancaria" },
-      { id: "billetera", label: "Nequi / Daviplata" },
-      { id: "tarjeta", label: "Tarjetas débito y crédito" },
-      { id: "pse", label: "PSE" },
+      { id: "nequi", label: "Nequi" },
+      { id: "bold", label: "Bold · Tarjeta débito y crédito" },
+      { id: "daviplata", label: "Daviplata" },
+      { id: "davivienda", label: "Davivienda" },
     ],
   },
 

@@ -1,6 +1,4 @@
 import {
-  Banknote,
-  Building2,
   CreditCard,
   Landmark,
   Smartphone,
@@ -11,11 +9,10 @@ import { cn } from "@/lib/utils";
 
 /** Icono para cada medio de pago (según el `id` en site-config). */
 const ICONS: Record<string, LucideIcon> = {
-  efectivo: Banknote,
-  transferencia: Landmark,
-  billetera: Smartphone,
-  tarjeta: CreditCard,
-  pse: Building2,
+  nequi: Smartphone,
+  bold: CreditCard,
+  daviplata: Smartphone,
+  davivienda: Landmark,
 };
 
 /**
