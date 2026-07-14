@@ -23,3 +23,26 @@ export const ORDER_META: Record<string, { text: string; cls: string }> = {
   FINALIZADO: { text: "Finalizado", cls: "bg-emerald-600/20 text-emerald-300" },
   CANCELADO: { text: "Cancelado", cls: "bg-red-500/15 text-red-300" },
 };
+
+/**
+ * Mensaje que se le envía al cliente (correo + WhatsApp) cuando su pedido
+ * pasa a cada estado. Redactado en tono cercano y sin emojis decorativos.
+ */
+export const ORDER_CUSTOMER_MSG: Record<string, string> = {
+  RECIBIDO:
+    "¡Recibimos tu pedido! Ya quedó registrado y muy pronto comenzaremos a trabajarlo.",
+  FABRICACION:
+    "Tu pedido entró en fabricación. Estamos preparando los materiales para tus cortinas.",
+  CORTE:
+    "Estamos en la etapa de corte de tus cortinas, midiendo y cortando la tela a tu medida.",
+  CONFECCION:
+    "Tu pedido está en confección: ya está tomando forma en nuestros talleres.",
+  DESPACHO:
+    "¡Tu pedido va en camino! Está en despacho hacia tu dirección. Te contactaremos para coordinar la entrega.",
+  INSTALACION:
+    "Estamos coordinando la instalación de tus cortinas. Recuerda que la instalación es totalmente gratis.",
+  FINALIZADO:
+    "¡Tu pedido está finalizado! Gracias por confiar en nosotros. Esperamos que disfrutes tus nuevas cortinas.",
+  CANCELADO:
+    "Tu pedido fue cancelado. Si tienes alguna duda o quieres retomarlo, contáctanos y con gusto te ayudamos.",
+};

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { updateOrderStatus, generateInvoice } from "../actions";
 import { ORDER_STATUSES, ORDER_META } from "@/lib/order-status";
+import { buildOrderStatusWhatsAppText } from "@/lib/order-notify";
 import { OrderTimeline } from "@/components/order/OrderTimeline";
 import { formatCOP } from "@/lib/utils";
 
@@ -36,6 +37,18 @@ export default async function PedidoDetallePage({
 
   const waDigits = order.customer.phone.replace(/\D/g, "");
   const waFull = waDigits.startsWith("57") ? waDigits : `57${waDigits}`;
+
+  // Enlace wa.me de respaldo con el aviso del estado actual (envío manual).
+  const statusWaText = buildOrderStatusWhatsAppText({
+    code: order.code,
+    status: order.status,
+    firstName: order.customer.firstName,
+    email: order.customer.email,
+    phone: order.customer.phone,
+    productName: order.quote?.productName ?? null,
+    note: null,
+  });
+  const statusWaLink = `https://wa.me/${waFull}?text=${encodeURIComponent(statusWaText)}`;
 
   return (
     <div className="space-y-6">
@@ -125,7 +138,24 @@ export default async function PedidoDetallePage({
               >
                 Guardar estado
               </button>
+              <p className="text-xs text-mist-2">
+                Al cambiar el estado se notifica automáticamente al cliente por
+                correo y WhatsApp.
+              </p>
             </form>
+
+            {/* Respaldo: enviar el aviso del estado actual por WhatsApp a mano */}
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+              <span className="text-xs text-mist-2">Envío manual de respaldo:</span>
+              <a
+                href={statusWaLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366]/15 px-3 py-1.5 text-xs text-emerald-300 transition hover:bg-[#25D366]/25"
+              >
+                Avisar por WhatsApp ({m.text})
+              </a>
+            </div>
           </div>
 
           {/* Facturación */}

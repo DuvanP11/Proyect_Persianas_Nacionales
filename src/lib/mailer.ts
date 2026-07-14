@@ -20,7 +20,7 @@ interface EmailMessage {
   html: string;
 }
 
-async function sendEmail(msg: EmailMessage): Promise<void> {
+export async function sendEmail(msg: EmailMessage): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
 
   // Proveedor: Resend (HTTP API, sin dependencias extra)

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { ORDER_STATUSES, type OrderStatus } from "@/lib/order-status";
+import { notifyOrderStatus } from "@/lib/order-notify";
 
 /** Cambia el estado del pedido y lo registra en el historial (si cambió). */
 export async function updateOrderStatus(formData: FormData): Promise<void> {
@@ -14,11 +15,16 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
   const note = String(formData.get("note") ?? "").trim() || null;
   if (!id || !ORDER_STATUSES.includes(status as OrderStatus)) return;
 
-  const order = await prisma.order.findUnique({ where: { id } });
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: { customer: true, quote: true },
+  });
   if (!order) return;
 
   // Si el estado no cambió pero hay nota, igual se registra como comentario.
   if (order.status === status && !note) return;
+
+  const statusChanged = order.status !== status;
 
   await prisma.order.update({
     where: { id },
@@ -27,6 +33,20 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
       history: { create: { status: status as OrderStatus, note } },
     },
   });
+
+  // Notifica al cliente por correo + WhatsApp solo cuando el estado cambia.
+  // Best-effort: si falla la notificación, el cambio de estado ya quedó guardado.
+  if (statusChanged) {
+    await notifyOrderStatus({
+      code: order.code,
+      status: status as OrderStatus,
+      firstName: order.customer.firstName,
+      email: order.customer.email,
+      phone: order.customer.phone,
+      productName: order.quote?.productName ?? null,
+      note,
+    });
+  }
 
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${id}`);
