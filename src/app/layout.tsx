@@ -6,7 +6,9 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
 import { CartProvider } from "@/components/cart/CartContext";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { siteConfig } from "@/lib/site-config";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -65,15 +67,19 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="es" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-screen antialiased">
-        <CartProvider>
-          <AnimatedBackground />
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <FloatingWhatsApp />
-        </CartProvider>
+        {/* Aplica el tema guardado antes de pintar (evita parpadeo) */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <ThemeProvider>
+          <CartProvider>
+            <AnimatedBackground />
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+            <FloatingWhatsApp />
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

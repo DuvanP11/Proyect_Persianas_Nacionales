@@ -8,6 +8,7 @@ import { Menu, X, User, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { CartMenu } from "@/components/cart/CartMenu";
+import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { Logo } from "./Logo";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
@@ -88,17 +89,19 @@ export function Navbar() {
             <WhatsAppIcon className="h-4 w-4" />
             WhatsApp
           </Button>
+          <ThemeSwitcher />
           <CartMenu />
         </div>
 
-        {/* Carrito + menú móvil */}
-        <div className="flex items-center gap-1 lg:hidden">
+        {/* Tema + carrito + menú móvil */}
+        <div className="flex items-center gap-0.5 lg:hidden">
+          <ThemeSwitcher />
           <CartMenu />
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-cloud"
-            aria-label="Abrir menú"
+            className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-morado to-naranja text-white shadow-lg shadow-morado/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-morado/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-morado/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

@@ -110,9 +110,11 @@ select optgroup {
 
 /* ---- Utilidades de marca ---- */
 
-/* Título blanco con detalle en morado claro */
+/* Título en color de texto principal con detalle en el acento.
+   Usa var(--color-cloud) (no blanco fijo) para que en modo claro el texto se
+   oscurezca y siga legible; el remate hereda el acento activo. */
 .text-gradient-morado {
-  background: linear-gradient(120deg, #ffffff 0%, #ffffff 55%, var(--color-morado-light) 100%);
+  background: linear-gradient(120deg, var(--color-cloud) 0%, var(--color-cloud) 55%, var(--color-morado-light) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -146,6 +148,93 @@ select optgroup {
 }
 @media (min-width: 768px) {
   .container-app { padding-inline: 2rem; }
+}
+
+/* =========================================================================
+   TEMATIZACIÓN EN VIVO
+   El sitio se retiñe cambiando variables CSS bajo [data-theme] / [data-accent]
+   en <html> (lo gestiona el ThemeProvider). Como las utilidades de Tailwind v4
+   referencian estas variables (p. ej. .bg-ink → var(--color-ink)), basta con
+   sobrescribirlas para recolorear todo sin tocar los componentes.
+   ========================================================================= */
+
+/* ---- Modo CLARO: se invierten superficies y texto ---- */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-ink: #f5f5f7;      /* fondo de página */
+  --color-ink-soft: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f0f4;
+  --color-line: #e2e2e8;
+
+  /* El texto se oscurece para mantener contraste sobre fondos claros */
+  --color-cloud: #191920;    /* texto principal */
+  --color-mist: #52525b;     /* texto atenuado */
+  --color-mist-2: #6b6b74;
+}
+
+/* Ajustes de superficies “premium” en claro (sombras y brillos suaves) */
+:root[data-theme="light"] .card-premium {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 40px -28px rgba(17, 17, 17, 0.22);
+}
+
+/* Opciones de <select> legibles en modo claro */
+:root[data-theme="light"] select option,
+:root[data-theme="light"] select optgroup {
+  background-color: #ffffff;
+  color: #191920;
+}
+
+/* ---- PALETAS DE ACENTO ----
+   Cada acento redefine las familias "morado" (primaria) y "naranja"
+   (secundaria), que alimentan botones, degradados, enlaces y realces.
+   El acento por defecto es "morado" (identidad de marca: morado → naranja). */
+
+:root[data-accent="morado"] {
+  --color-morado: #8b5cf6;
+  --color-morado-light: #c4b5fd;
+  --color-morado-dark: #6d28d9;
+  --color-naranja: #fb7a1e;
+  --color-naranja-light: #fdba74;
+  --color-naranja-dark: #ea580c;
+}
+
+:root[data-accent="naranja"] {
+  --color-morado: #fb7a1e;
+  --color-morado-light: #fdba74;
+  --color-morado-dark: #ea580c;
+  --color-naranja: #f59e0b;
+  --color-naranja-light: #fcd34d;
+  --color-naranja-dark: #d97706;
+}
+
+:root[data-accent="rosa"] {
+  --color-morado: #e84d6f;
+  --color-morado-light: #f9a8be;
+  --color-morado-dark: #c2325a;
+  --color-naranja: #fb7185;
+  --color-naranja-light: #fda4b3;
+  --color-naranja-dark: #e11d48;
+}
+
+:root[data-accent="celeste"] {
+  --color-morado: #2b9fe0;
+  --color-morado-light: #7dd3fc;
+  --color-morado-dark: #0a6fb0;
+  --color-naranja: #38bdf8;
+  --color-naranja-light: #bae6fd;
+  --color-naranja-dark: #0284c7;
+}
+
+:root[data-accent="gris"] {
+  --color-morado: #64748b;
+  --color-morado-light: #cbd5e1;
+  --color-morado-dark: #475569;
+  --color-naranja: #94a3b8;
+  --color-naranja-light: #e2e8f0;
+  --color-naranja-dark: #64748b;
 }
 
 /* Respeta usuarios con movimiento reducido */
