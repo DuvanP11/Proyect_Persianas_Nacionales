@@ -9,6 +9,7 @@ import { formatCOP } from "@/lib/utils";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import { ProductConfigurator } from "@/components/catalog/ProductConfigurator";
 import { Reveal } from "@/components/ui/Reveal";
 
 export async function generateStaticParams() {
@@ -126,21 +127,35 @@ export default async function ProductPage({
               </ul>
             </div>
 
-            {/* CTAs */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {/* Personalización + agregar al carrito */}
+            <div className="mt-8">
+              <h2 className="font-display text-xl font-semibold text-cloud">
+                Personaliza tu producto
+              </h2>
+              <p className="mt-1 text-sm text-mist">
+                Escoge diseño, color, tela, cantidad y metros; agrégalo al carrito y
+                envía tu solicitud por WhatsApp.
+              </p>
+              <div className="mt-4">
+                <ProductConfigurator product={product} variant="page" />
+              </div>
+            </div>
+
+            {/* CTAs alternativos */}
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               <Link
                 href={`/cotizar?producto=${encodeURIComponent(product.name)}`}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-morado to-naranja px-6 py-3.5 text-sm font-medium text-white shadow-lg shadow-morado/25 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-morado/40"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-line bg-white/[0.02] px-6 py-3 text-sm font-medium text-cloud transition-all hover:-translate-y-0.5 hover:border-morado/60 hover:bg-white/[0.05]"
               >
-                Cotizar este producto
+                Cotizar con el formulario
               </Link>
               <a
                 href={buildWhatsAppUrl(quickQuoteMessage(product.name))}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-medium text-white shadow-lg shadow-[#25D366]/25 transition-all hover:-translate-y-0.5 hover:brightness-110"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-[#25D366]/40 px-6 py-3 text-sm font-medium text-[#25D366] transition-all hover:-translate-y-0.5 hover:bg-[#25D366]/10"
               >
-                <WhatsAppIcon className="h-4 w-4" /> WhatsApp
+                <WhatsAppIcon className="h-4 w-4" /> Escribir por WhatsApp
               </a>
             </div>
 

@@ -4,6 +4,8 @@ import "./globals.css";
 import { AnimatedBackground } from "@/components/layout/AnimatedBackground";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
+import { CartProvider } from "@/components/cart/CartContext";
 import { siteConfig } from "@/lib/site-config";
 
 const inter = Inter({
@@ -65,10 +67,13 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-screen antialiased">
-        <AnimatedBackground />
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <CartProvider>
+          <AnimatedBackground />
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+          <FloatingWhatsApp />
+        </CartProvider>
       </body>
     </html>
   );

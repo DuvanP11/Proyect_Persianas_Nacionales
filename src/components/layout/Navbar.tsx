@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, User, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { CartMenu } from "@/components/cart/CartMenu";
 import { Logo } from "./Logo";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
@@ -87,18 +88,22 @@ export function Navbar() {
             <WhatsAppIcon className="h-4 w-4" />
             WhatsApp
           </Button>
+          <CartMenu />
         </div>
 
-        {/* Botón menú móvil */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-cloud lg:hidden"
-          aria-label="Abrir menú"
-          aria-expanded={open}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        {/* Carrito + menú móvil */}
+        <div className="flex items-center gap-1 lg:hidden">
+          <CartMenu />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-cloud"
+            aria-label="Abrir menú"
+            aria-expanded={open}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </nav>
 
       <AnimatePresence>

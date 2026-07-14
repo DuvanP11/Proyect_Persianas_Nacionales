@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import type { Product } from "@/lib/products";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 import { ProductMedia } from "./ProductMedia";
+import { CardAddToCart } from "./QuickAddModal";
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   return (
@@ -64,12 +65,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
 
         {/* Botones */}
         <div className="mt-5 flex gap-2">
-          <Link
-            href={`/cotizar?producto=${encodeURIComponent(product.name)}`}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-morado to-naranja px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-morado/25 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-morado/40"
-          >
-            Cotizar <ArrowRight className="h-4 w-4" />
-          </Link>
+          <CardAddToCart product={product} />
           <a
             href={buildWhatsAppUrl(quickQuoteMessage(product.name))}
             target="_blank"
@@ -80,6 +76,12 @@ export function ProductCard({ product, priority = false }: { product: Product; p
             <WhatsAppIcon className="h-4 w-4" />
           </a>
         </div>
+        <Link
+          href={`/catalogo/${product.slug}`}
+          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-line bg-white/[0.02] px-4 py-2.5 text-sm font-medium text-cloud transition-all hover:-translate-y-0.5 hover:border-morado/60 hover:bg-white/[0.05]"
+        >
+          Ver detalle y personalizar
+        </Link>
 
         {/* Distintivo instalación gratis */}
         <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-naranja/25 bg-naranja/[0.07] py-2 text-sm font-medium text-naranja-light">
