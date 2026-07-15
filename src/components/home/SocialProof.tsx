@@ -10,11 +10,19 @@ import { getApprovedReviews } from "@/lib/reviews";
  * Si todavía no hay reseñas, cae a marcadores de posición elegantes.
  */
 
-/** Fotos y videos de instalaciones reales (`public/galeria`). */
-const WORK_GALLERY: { type: "image" | "video"; src: string; poster?: string; alt: string }[] = [
-  { type: "video", src: "/galeria/instalacion-1.mp4", poster: "/galeria/instalacion-1.jpeg", alt: "Instalación de riel en ventana de sala" },
-  { type: "video", src: "/galeria/instalacion-2.mp4", poster: "/galeria/instalacion-2.jpeg", alt: "Montaje de soportes sobre el marco" },
-  { type: "video", src: "/galeria/instalacion-3.mp4", alt: "Instalación terminada en vivienda" },
+/**
+ * Fotos y videos de instalaciones reales (`public/galeria`).
+ *
+ * Los videos NO llevan `poster`. Antes apuntaba a las fotos sueltas de más
+ * abajo, que son de otro trabajo: antes de darle play se anunciaba una escena
+ * que el video no contenía. El `#t=0.1` del src hace que el navegador busque ese
+ * instante y pinte un fotograma del propio video como miniatura, que es lo
+ * honesto y además no necesita generar imágenes aparte.
+ */
+const WORK_GALLERY: { type: "image" | "video"; src: string; alt: string }[] = [
+  { type: "video", src: "/galeria/instalacion-1.mp4#t=0.1", alt: "Instalación de riel en ventana de sala" },
+  { type: "video", src: "/galeria/instalacion-2.mp4#t=0.1", alt: "Montaje de soportes sobre el marco" },
+  { type: "video", src: "/galeria/instalacion-3.mp4#t=0.1", alt: "Instalación terminada en vivienda" },
   { type: "image", src: "/galeria/instalacion-1.jpeg", alt: "Nuestro técnico fijando el soporte al muro" },
   { type: "image", src: "/galeria/instalacion-2.jpeg", alt: "Perforación del riel a la altura del marco" },
 ];
@@ -169,8 +177,9 @@ export async function SocialProof() {
                     {item.type === "video" ? (
                       <video
                         src={item.src}
-                        poster={item.poster}
                         controls
+                        // "metadata" basta para que el navegador resuelva el
+                        // fotograma de #t=0.1 sin descargar el video entero.
                         preload="metadata"
                         playsInline
                         className="h-full w-full object-cover"

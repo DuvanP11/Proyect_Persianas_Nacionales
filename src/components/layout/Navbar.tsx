@@ -47,15 +47,20 @@ export function Navbar() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <nav className="container-app flex h-16 items-center justify-between md:h-20">
-        <Logo />
+      <nav className="container-app flex h-16 items-center justify-between gap-3 md:h-20">
+        <div className="shrink-0">
+          <Logo />
+        </div>
 
-        <ul className="hidden items-center gap-1 lg:flex">
+        {/* `whitespace-nowrap`: sin esto, en cuanto el espacio aprieta el
+            navegador parte las etiquetas de dos palabras ("¿Cómo medir?",
+            "Ingreso Cliente") en dos líneas y descuadra la barra. */}
+        <ul className="hidden items-center gap-1 xl:flex">
           {links.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="rounded-full px-4 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
+                className="whitespace-nowrap rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
               >
                 {l.label}
               </Link>
@@ -63,20 +68,28 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden shrink-0 items-center gap-2 xl:flex">
+          {/* Entre 1280 y 1536 px estos dos accesos se quedan en ícono: con sus
+              etiquetas, el contenido de la barra pasa de ~1250 px y solo hay
+              ~1216 disponibles, así que volveríamos a apretarla. El nombre sigue
+              disponible en el tooltip y para lectores de pantalla. */}
           <Link
             href="/cuenta"
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
+            title="Ingreso Cliente"
+            aria-label="Ingreso Cliente"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
           >
-            <User className="h-4 w-4" />
-            Ingreso Cliente
+            <User className="h-4 w-4 shrink-0" />
+            <span className="hidden 2xl:inline">Ingreso Cliente</span>
           </Link>
           <Link
             href="/admin/login"
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
+            title="Admin"
+            aria-label="Admin"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-sm text-mist transition-colors hover:bg-white/[0.05] hover:text-cloud"
           >
-            <Lock className="h-3.5 w-3.5" />
-            Admin
+            <Lock className="h-3.5 w-3.5 shrink-0" />
+            <span className="hidden 2xl:inline">Admin</span>
           </Link>
           <Button href="/cotizar" variant="outline" size="sm">
             Cotizar
@@ -96,8 +109,13 @@ export function Navbar() {
           <CartMenu />
         </div>
 
-        {/* Tema + notificaciones + carrito + menú móvil */}
-        <div className="flex items-center gap-0.5 lg:hidden">
+        {/* Tema + notificaciones + carrito + menú compacto.
+            El umbral es `xl` y no `lg` a propósito: entre 1024 y 1280 px no caben
+            el logo, cinco enlaces, dos accesos, dos botones y tres íconos, y la
+            barra se apretaba hasta romperse. Ese rango también es donde cae un
+            monitor normal con el zoom al 110-125 %, que es como se ve el
+            problema en la práctica. Ahí ahora sale el menú desplegable. */}
+        <div className="flex shrink-0 items-center gap-0.5 xl:hidden">
           <ThemeSwitcher />
           <SiteNotificationBell />
           <CartMenu />
@@ -120,7 +138,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-line/60 bg-ink/95 backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-t border-line/60 bg-ink/95 backdrop-blur-xl xl:hidden"
           >
             <ul className="container-app flex flex-col gap-1 py-4">
               {links.map((l) => (
