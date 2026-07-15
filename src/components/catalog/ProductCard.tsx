@@ -4,15 +4,13 @@ import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import type { Product } from "@/lib/products";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
-import { ProductMedia } from "./ProductMedia";
+import { ProductCardGallery } from "./ProductCardGallery";
 import { CardAddToCart } from "./QuickAddModal";
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   return (
     <article className="group card-premium flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-morado/50 hover:shadow-[0_30px_60px_-30px_rgba(139,92,246,0.5)]">
-      <Link href={`/catalogo/${product.slug}`} className="block">
-        <ProductMedia product={product} className="aspect-[4/3]" priority={priority} />
-      </Link>
+      <ProductCardGallery product={product} priority={priority} />
 
       <div className="flex flex-1 flex-col p-5">
         {product.category && (
