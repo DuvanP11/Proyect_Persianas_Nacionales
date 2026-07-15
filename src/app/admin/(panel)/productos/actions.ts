@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { products as catalogoDelCodigo } from "@/lib/products";
 import { slugify } from "@/lib/slug";
 
 export type ProductFormState = { error?: string };
@@ -17,6 +18,51 @@ function revalidateCatalog(slug?: string) {
   revalidatePath("/admin/productos");
   revalidatePath("/admin");
   if (slug) revalidatePath(`/catalogo/${slug}`);
+}
+
+/**
+ * Vuelca en la BD las fotos y videos que trae el catálogo del código
+ * (`src/lib/products.ts`), producto por producto según el slug.
+ *
+ * Existe porque el sitio sirve el catálogo desde la BD: subir fotos nuevas al
+ * repo no basta, hay que reflejarlas. El script `npm run seed:products` hace lo
+ * mismo, pero exige terminal y la cadena de conexión de producción; esto se
+ * resuelve desde el panel.
+ *
+ * Solo toca la galería (ProductMedia). No pisa nombre, precio, colores ni
+ * descripción: eso se edita desde aquí y sería grosero sobrescribirlo.
+ */
+export async function syncCatalogPhotos(): Promise<void> {
+  await requireAdmin();
+
+  for (const p of catalogoDelCodigo) {
+    const existente = await prisma.product.findUnique({
+      where: { slug: p.slug },
+      select: { id: true },
+    });
+    // Producto que no está en la BD: se ignora. Crearlo aquí sería revivir algo
+    // que quizá el admin borró a propósito.
+    if (!existente) continue;
+
+    const media = [
+      ...p.images.map((url, idx) => ({ type: "IMAGE" as const, url, sortOrder: idx })),
+      ...p.videos.map((url, idx) => ({ type: "VIDEO" as const, url, sortOrder: idx })),
+    ];
+    if (media.length === 0) continue;
+
+    // Reemplazo atómico: si algo falla, el producto conserva su galería previa
+    // en vez de quedarse sin ninguna.
+    await prisma.$transaction([
+      prisma.productMedia.deleteMany({ where: { productId: existente.id } }),
+      prisma.productMedia.createMany({
+        data: media.map((m) => ({ ...m, productId: existente.id })),
+      }),
+    ]);
+
+    revalidatePath(`/catalogo/${p.slug}`);
+  }
+
+  revalidateCatalog();
 }
 
 /** Convierte un textarea (una línea por elemento) en arreglo, sin vacíos. */

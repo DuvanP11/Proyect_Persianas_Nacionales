@@ -4,6 +4,7 @@ import { formatCOP } from "@/lib/utils";
 import { ConfirmDeleteButton } from "@/components/admin/ConfirmDeleteButton";
 import {
   deleteProduct,
+  syncCatalogPhotos,
   toggleProductActive,
   toggleProductFeatured,
 } from "./actions";
@@ -25,13 +26,31 @@ export default async function ProductosPage() {
             {productos.length} {productos.length === 1 ? "producto" : "productos"} en el catálogo.
           </p>
         </div>
-        <Link
-          href="/admin/productos/nuevo"
-          className="rounded-full bg-gradient-to-r from-morado to-naranja px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-morado/25 transition-all hover:-translate-y-0.5"
-        >
-          + Nuevo producto
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <form action={syncCatalogPhotos}>
+            <button
+              type="submit"
+              title="Vuelve a cargar en la base de datos las fotos que trae el catálogo del código. Reemplaza la galería de cada producto."
+              className="rounded-full border border-line px-4 py-2.5 text-sm text-mist transition hover:border-morado/50 hover:text-cloud"
+            >
+              Sincronizar fotos del catálogo
+            </button>
+          </form>
+          <Link
+            href="/admin/productos/nuevo"
+            className="rounded-full bg-gradient-to-r from-morado to-naranja px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-morado/25 transition-all hover:-translate-y-0.5"
+          >
+            + Nuevo producto
+          </Link>
+        </div>
       </div>
+
+      <p className="rounded-xl border border-line bg-surface/40 px-4 py-3 text-xs text-mist">
+        <span className="font-medium text-cloud">Nota:</span> el sitio muestra las fotos guardadas
+        aquí, no las del código. Si subiste fotos nuevas al proyecto, pulsa{" "}
+        <span className="text-cloud">Sincronizar fotos del catálogo</span> para que aparezcan en la
+        web. Ojo: reemplaza la galería de cada producto por la del código.
+      </p>
 
       {productos.length === 0 ? (
         <div className="rounded-2xl border border-line bg-surface/60 p-8 text-center text-sm text-mist">
