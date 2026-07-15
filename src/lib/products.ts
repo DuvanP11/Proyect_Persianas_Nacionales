@@ -38,6 +38,36 @@ export interface Product {
 }
 
 /**
+ * Líneas que admiten motorización.
+ *
+ * La motorización dejó de ser un producto aparte y pasó a ser una opción del
+ * pedido ("¿Motorizada? Sí / No"). El motor tubular solo aplica a persianas
+ * ENROLLABLES y VERTICALES: en un panel japonés, una hana de onda o una cortina
+ * tradicional el sistema es un riel corredero, no un tubo, así que ahí la
+ * pregunta no se muestra.
+ *
+ * Va por slug y no como columna en la BD para no exigir una migración. Si más
+ * adelante el panel permite crear líneas enrollables nuevas, esto debería
+ * convertirse en un campo de `Product`.
+ */
+const SLUGS_MOTORIZABLES = new Set([
+  "blackout",
+  "sheer-elegance",
+  "sistema-2-en-1-sheer-elegance",
+  "persianas-screen",
+  "persianas-verticales",
+]);
+
+/** Si esta línea se puede pedir motorizada. */
+export function esMotorizable(slug: string): boolean {
+  return SLUGS_MOTORIZABLES.has(slug);
+}
+
+/** Texto que acompaña a la opción, para explicar el alcance del sistema. */
+export const MOTORIZACION_NOTA =
+  "Sistema de motorización para persianas enrollables y verticales: motor tubular con control inalámbrico.";
+
+/**
  * Fotografías reales de cada línea, en `public/catalog/<slug>/01.jpg`…
  * Se numeran de forma correlativa, así que basta con indicar cuántas hay.
  */
@@ -196,30 +226,6 @@ export const products: Product[] = [
     images: [...fotos("panel-japones", 7), "/catalog/panel-japones.jpg"],
     videos: [],
     gradient: "from-zinc-500 via-zinc-400 to-zinc-600",
-  },
-  {
-    slug: "persianas-motorizadas",
-    name: "Persianas Motorizadas",
-    short: "Domótica y confort: controla tus cortinas con un botón o tu voz.",
-    description:
-      "Automatiza tu hogar u oficina con persianas motorizadas controlables por control remoto, app o asistentes de voz. Compatibles con telas Blackout, Screen y Sheer: programa horarios, integra con domótica y disfruta del máximo confort y sofisticación con un motor tubular silencioso.",
-    tela: "Compatible con Blackout, Screen y Sheer",
-    material: "Motor tubular + control inalámbrico",
-    diseno: "Enrollable / vertical motorizada",
-    colors: [
-      { name: "Blanco", hex: "#f4f4f2" },
-      { name: "Beige", hex: "#d9cdb5" },
-      { name: "Gris", hex: "#8b9096" },
-      { name: "Titanio", hex: "#6b7581" },
-      { name: "Negro", hex: "#26262a" },
-    ],
-    pricePerMeter: null,
-    productionTime: "7 a 10 días hábiles",
-    features: ["Control remoto / app", "Compatible domótica", "Programable", "Máximo confort"],
-    images: ["/catalog/persianas-motorizadas.jpg"],
-    videos: [],
-    gradient: "from-violet-900 via-violet-800 to-slate-900",
-    featured: true,
   },
   {
     slug: "hanas-vintage",

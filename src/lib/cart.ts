@@ -29,6 +29,11 @@ export interface CartItem {
   widthM: number;
   /** Alto de la ventana en metros (admite decimales). */
   heightM: number;
+  /**
+   * Si se pide con motorización. `undefined` en las líneas que no la admiten
+   * (panel japonés, hanas, tradicionales), donde ni siquiera se pregunta.
+   */
+  motorized?: boolean;
 }
 
 /**
@@ -124,6 +129,11 @@ export function cartToWhatsAppMessage(items: CartItem[]): string {
     lines.push(`   - Cantidad: ${it.quantity}`);
     lines.push(`   - Ancho: ${formatMeters(it.widthM)} m`);
     lines.push(`   - Alto: ${formatMeters(it.heightM)} m`);
+    // Solo se menciona en las líneas que admiten motor; en las demás la línea
+    // sobraría y solo haría ruido en el mensaje.
+    if (it.motorized != null) {
+      lines.push(`   - Motorizada: ${it.motorized ? "Sí" : "No"}`);
+    }
     lines.push("");
   });
 

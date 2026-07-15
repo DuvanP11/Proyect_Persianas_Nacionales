@@ -8,8 +8,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, Check, Ruler, X } from "lucide-react";
 import {
   ALTO_CASOS,
+  ALTO_INTRO,
   ANCHO_CASOS,
+  ANCHO_INTRO,
   MEASURE_IMAGES,
+  MEASURE_IMPORTANTE,
   MEASURE_TIP,
 } from "@/lib/measure-guide";
 import { cn } from "@/lib/utils";
@@ -156,6 +159,7 @@ export function MeasureGuideButton({
           <p className="text-xs font-semibold uppercase tracking-wider text-morado-light">
             Ancho (X)
           </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-mist">{ANCHO_INTRO}</p>
           <ul className="mt-1.5 space-y-1">
             {ANCHO_CASOS.map((c) => (
               <li key={c.caso} className="flex justify-between gap-3 text-xs">
@@ -170,6 +174,7 @@ export function MeasureGuideButton({
           <p className="text-xs font-semibold uppercase tracking-wider text-naranja-light">
             Alto (Y)
           </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-mist">{ALTO_INTRO}</p>
           <ul className="mt-1.5 space-y-1">
             {ALTO_CASOS.map((c) => (
               <li key={c.caso} className="flex justify-between gap-3 text-xs">
@@ -179,6 +184,10 @@ export function MeasureGuideButton({
             ))}
           </ul>
         </div>
+
+        <p className="rounded-lg border border-naranja/30 bg-naranja/[0.07] p-3 text-[11px] leading-relaxed text-mist">
+          <span className="font-medium text-naranja-light">Importante:</span> {MEASURE_IMPORTANTE}
+        </p>
 
         <p className="rounded-lg border border-morado/25 bg-morado/[0.06] p-3 text-[11px] leading-relaxed text-mist">
           <span className="font-medium text-cloud">Tip:</span> {MEASURE_TIP}

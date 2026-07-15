@@ -27,11 +27,15 @@ import { PaymentMethods } from "@/components/ui/PaymentMethods";
 import { siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
+// Ojo: son enlaces escritos a mano. Si se quita una línea del catálogo, hay que
+// quitarla también de aquí o el footer queda apuntando a un 404 (es lo que pasó
+// al retirar "Persianas Motorizadas", que dejó de ser producto y pasó a ser una
+// opción del pedido).
 const catalogo = [
   { href: "/catalogo", label: "Catálogo completo" },
   { href: "/catalogo/blackout", label: "Blackout" },
   { href: "/catalogo/sheer-elegance", label: "Sheer Elegance" },
-  { href: "/catalogo/persianas-motorizadas", label: "Persianas Motorizadas" },
+  { href: "/catalogo/persianas-verticales", label: "Persianas Verticales" },
   { href: "/como-medir", label: "¿Cómo medir?" },
 ];
 

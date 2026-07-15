@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Ruler, ArrowRight, MoveHorizontal, MoveVertical } from "lucide-react";
+import { AlertTriangle, Ruler, ArrowRight, MoveHorizontal, MoveVertical } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import {
   ALTO_CASOS,
+  ALTO_INTRO,
   ANCHO_CASOS,
+  ANCHO_INTRO,
   MEASURE_IMAGES,
+  MEASURE_IMPORTANTE,
   MEASURE_TIP,
 } from "@/lib/measure-guide";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
@@ -46,9 +49,7 @@ export default function ComoMedirPage() {
             </span>
             <h2 className="font-display text-2xl font-semibold text-cloud">Mide el ancho (X)</h2>
           </div>
-          <p className="mt-2 max-w-2xl text-sm text-mist">
-            Mide el ancho de la ventana y aplica la holgura según su ubicación:
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-mist">{ANCHO_INTRO}</p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {ANCHO_CASOS.map((c) => (
               <Reveal key={c.caso}>
@@ -70,10 +71,8 @@ export default function ComoMedirPage() {
             </span>
             <h2 className="font-display text-2xl font-semibold text-cloud">Mide el alto (Y)</h2>
           </div>
-          <p className="mt-2 max-w-2xl text-sm text-mist">
-            Mide la altura y ten en cuenta si la ventana llega o no hasta el piso:
-          </p>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <p className="mt-2 max-w-2xl text-sm text-mist">{ALTO_INTRO}</p>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
             {ALTO_CASOS.map((c) => (
               <Reveal key={c.caso}>
                 <div className="card-premium h-full p-5">
@@ -85,6 +84,14 @@ export default function ComoMedirPage() {
             ))}
           </div>
         </section>
+
+        {/* Importante — el error más común: dentro de un vano no se suma, se resta. */}
+        <div className="mt-10 rounded-2xl border border-naranja/30 bg-naranja/[0.07] p-5">
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-naranja-light">
+            <AlertTriangle className="h-4 w-4" /> Importante
+          </p>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-mist">{MEASURE_IMPORTANTE}</p>
+        </div>
 
         {/* Ilustraciones oficiales */}
         <section className="mt-14">

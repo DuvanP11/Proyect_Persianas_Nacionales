@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Minus, MoveHorizontal, MoveVertical, Plus, ShoppingBag } from "lucide-react";
+import { Check, Minus, MoveHorizontal, MoveVertical, Plus, ShoppingBag, Zap } from "lucide-react";
 import { MeasureGuideButton } from "@/components/catalog/MeasureGuideButton";
 import { useCart } from "@/components/cart/CartContext";
 import {
@@ -11,7 +11,7 @@ import {
   designOptionsFor,
   FABRIC_OPTIONS,
 } from "@/lib/cart";
-import type { Product } from "@/lib/products";
+import { esMotorizable, MOTORIZACION_NOTA, type Product } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 /**
@@ -50,6 +50,9 @@ export function ProductConfigurator({
   const [added, setAdded] = useState(false);
   // Paso obligatorio: sin confirmar la guía de medición no se agrega al carrito.
   const [measureConfirmed, setMeasureConfirmed] = useState(false);
+  // Solo aplica a enrollables y verticales; en el resto no se pregunta.
+  const motorizable = esMotorizable(product.slug);
+  const [motorized, setMotorized] = useState(false);
 
   const color = colors[colorIdx] ?? colors[0];
 
@@ -84,6 +87,7 @@ export function ProductConfigurator({
       quantity,
       widthM: widthNum,
       heightM: heightNum,
+      motorized: motorizable ? motorized : undefined,
     });
 
     setAdded(true);
@@ -177,6 +181,41 @@ export function ProductConfigurator({
           })}
         </div>
       </div>
+
+      {/* Motorización — solo en enrollables y verticales */}
+      {motorizable && (
+        <div className="mt-4 rounded-xl border border-line bg-white/[0.03] p-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="inline-flex items-center gap-2 text-sm text-cloud">
+              <Zap className="h-4 w-4 text-naranja-light" />
+              ¿Motorizada?
+            </span>
+            <div className="flex gap-1.5" role="radiogroup" aria-label="¿Motorizada?">
+              {[
+                { valor: true, texto: "Sí" },
+                { valor: false, texto: "No" },
+              ].map((op) => (
+                <button
+                  key={op.texto}
+                  type="button"
+                  role="radio"
+                  aria-checked={motorized === op.valor}
+                  onClick={() => setMotorized(op.valor)}
+                  className={cn(
+                    "min-w-14 rounded-full border px-3.5 py-1.5 text-sm transition-colors",
+                    motorized === op.valor
+                      ? "border-morado bg-morado/20 font-medium text-cloud"
+                      : "border-line text-mist hover:border-morado/50 hover:text-cloud",
+                  )}
+                >
+                  {op.texto}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-mist-2">{MOTORIZACION_NOTA}</p>
+        </div>
+      )}
 
       {/* Cantidad + Metros */}
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -22,39 +22,46 @@ export type MeasureImage = {
   height: number;
 };
 
+/** La regla en una frase. Encabeza el bloque de ancho en la página y en la
+ *  ventana flotante; los casos de abajo solo la desglosan. */
+export const ANCHO_INTRO =
+  "Mide de extremo a extremo de la ventana y agrega 10 cm por cada lado libre. Si un lado está pegado a una pared, no agregues esos 10 cm.";
+
+export const ALTO_INTRO =
+  "Mide de arriba hacia abajo y agrega 10 cm en la parte superior y 10 cm en la parte inferior para una mejor cobertura.";
+
+/** El caso que más se equivoca: dentro de un vano NO se suma, se resta. */
+export const MEASURE_IMPORTANTE =
+  "Si tu ventana está entre dos paredes (dentro de un vano), no agregues centímetros. Solo mide el espacio y resta 0,5 cm al ancho para facilitar la instalación.";
+
 export const ANCHO_CASOS: MeasureCase[] = [
   {
     caso: "Ventana entre paredes",
-    formula: "Ancho = X − 0.5 cm",
-    nota: "Descuenta medio centímetro para que la cortina entre justa entre las dos paredes.",
+    formula: "Ancho = X − 0,5 cm",
+    nota: "Está dentro de un vano: no sumes nada. Resta medio centímetro para que entre justa entre las dos paredes.",
   },
   {
     caso: "Ventana libre a un lado",
     formula: "Ancho = X + 10 cm",
-    nota: "Suma 10 cm hacia el lado libre para cubrir bien la ventana.",
+    nota: "Un lado toca pared y el otro está libre: suma 10 cm solo hacia el lado libre.",
   },
   {
     caso: "Ventana libre a ambos lados",
     formula: "Ancho = X + 20 cm",
-    nota: "Suma 10 cm a cada lado (20 cm en total) para una mejor cobertura.",
+    nota: "Los dos lados están libres: suma 10 cm a cada uno, 20 cm en total.",
   },
 ];
 
 export const ALTO_CASOS: MeasureCase[] = [
   {
-    caso: "Ventana desde el techo",
-    formula: "Alto = Y + 15 cm",
-    nota: "Suma 15 cm para el soporte arriba y una caída elegante debajo del marco.",
-  },
-  {
-    caso: "Ventana separada del techo",
-    formula: "Alto = Y + 10 a 15 cm",
-    nota: "Suma entre 10 y 15 cm cuando hay espacio entre el techo y la ventana.",
+    caso: "Caso general",
+    formula: "Alto = Y + 20 cm",
+    nota: "Suma 10 cm arriba (para el soporte) y 10 cm abajo, para una mejor cobertura.",
   },
   {
     caso: "Ventana que va hasta el piso",
     formula: "Alto = Y − 3 cm",
-    nota: "Descuenta 3 cm para que la cortina no arrastre ni roce el piso.",
+    nota: "Aquí no sumes los 10 cm de abajo: descuenta 3 cm para que la cortina no arrastre ni roce el piso.",
   },
 ];
 
@@ -64,6 +71,11 @@ export const ALTO_CASOS: MeasureCase[] = [
  * `width`/`height` son las dimensiones reales de cada archivo. Importan: son
  * capturas pequeñas, así que se muestran a tamaño nativo como máximo. Estirarlas
  * para llenar la columna las vuelve borrosas — no hay más detalle que inventar.
+ *
+ * A las dos ilustraciones de "lado libre" se les recortó el panel de altura que
+ * traían debajo: indicaba Y + 15 cm y Y + 10-15 cm, que ya no es la regla
+ * (ahora son 10 cm arriba y 10 abajo). Se conserva la mitad del ancho, que sí
+ * coincide. Cuando haya ilustraciones nuevas de altura, se agregan aquí.
  */
 export const MEASURE_IMAGES: MeasureImage[] = [
   {
@@ -75,17 +87,17 @@ export const MEASURE_IMAGES: MeasureImage[] = [
   },
   {
     src: "/medir/ancho-libre-un-lado.png",
-    alt: "Ventana libre a un lado: el ancho es X más 10 cm, con las dos formas de medir la altura",
-    caption: "Libre a un lado — Ancho = X + 10 cm · Altura según el techo",
+    alt: "Ventana libre a un lado: el ancho es X más 10 cm",
+    caption: "Libre a un lado — Ancho = X + 10 cm",
     width: 376,
-    height: 525,
+    height: 248,
   },
   {
     src: "/medir/ancho-libre-ambos-lados.png",
-    alt: "Ventana libre a ambos lados: el ancho es X más 20 cm, con las dos formas de medir la altura",
-    caption: "Libre a ambos lados — Ancho = X + 20 cm · Altura según el techo",
+    alt: "Ventana libre a ambos lados: el ancho es X más 20 cm",
+    caption: "Libre a ambos lados — Ancho = X + 20 cm",
     width: 391,
-    height: 526,
+    height: 248,
   },
   {
     src: "/medir/sin-metro-usa-tu-cuerpo.png",

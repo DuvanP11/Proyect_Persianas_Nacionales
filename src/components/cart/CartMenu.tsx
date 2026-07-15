@@ -160,6 +160,13 @@ export function CartMenu({ className }: { className?: string }) {
                           Cantidad: <span className="text-cloud">{it.quantity}</span> · Ancho:{" "}
                           <span className="text-cloud">{formatMeters(it.widthM)} m</span> · Alto:{" "}
                           <span className="text-cloud">{formatMeters(it.heightM)} m</span>
+                          {it.motorized != null && (
+                            <>
+                              {" "}
+                              · Motorizada:{" "}
+                              <span className="text-cloud">{it.motorized ? "Sí" : "No"}</span>
+                            </>
+                          )}
                         </p>
                       </div>
                     </li>
