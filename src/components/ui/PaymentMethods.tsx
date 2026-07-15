@@ -1,24 +1,20 @@
-import {
-  CreditCard,
-  Landmark,
-  Smartphone,
-  type LucideIcon,
-} from "lucide-react";
+import Image from "next/image";
+import { CreditCard } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
-
-/** Icono para cada medio de pago (según el `id` en site-config). */
-const ICONS: Record<string, LucideIcon> = {
-  nequi: Smartphone,
-  bold: CreditCard,
-  daviplata: Smartphone,
-  davivienda: Landmark,
-};
 
 /**
  * Medios de pago aceptados. Se usa en el footer (`variant="full"`) y, en versión
  * compacta (`variant="compact"`), en la ficha de producto y el modal del carrito.
  * Los datos salen de `siteConfig.payments` para editarlos en un solo lugar.
+ *
+ * Cada entidad se muestra con su logo oficial sobre una pastilla blanca: los
+ * logos vienen con fondo blanco y colores de marca fijos, así que sobre el tema
+ * oscuro se recortarían como rectángulos y en el claro se perderían contra la
+ * página. La pastilla los aísla y se ve igual en ambos temas.
+ *
+ * El nombre de la entidad viaja en `alt`/`title`: quien no cargue las imágenes o
+ * navegue con lector de pantalla sigue sabiendo qué medios se aceptan.
  */
 export function PaymentMethods({
   variant = "full",
@@ -36,33 +32,29 @@ export function PaymentMethods({
         <h3
           className={cn(
             "font-semibold text-cloud",
-            variant === "full"
-              ? "text-sm uppercase tracking-wider"
-              : "text-sm",
+            variant === "full" ? "text-sm uppercase tracking-wider" : "text-sm",
           )}
         >
           Medios de pago
         </h3>
       </div>
 
-      <ul
-        className={cn(
-          "mt-3 flex flex-wrap gap-2",
-          variant === "full" && "gap-2.5",
-        )}
-      >
-        {methods.map((m) => {
-          const Icon = ICONS[m.id] ?? CreditCard;
-          return (
-            <li
-              key={m.id}
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-white/[0.03] px-3 py-1.5 text-xs text-cloud"
-            >
-              <Icon className="h-3.5 w-3.5 text-morado-light" />
-              {m.label}
-            </li>
-          );
-        })}
+      <ul className={cn("mt-3 flex flex-wrap items-center gap-2", variant === "full" && "gap-2.5")}>
+        {methods.map((m) => (
+          <li
+            key={m.id}
+            title={m.label}
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-line bg-white px-3 shadow-sm"
+          >
+            <Image
+              src={m.logo}
+              alt={m.label}
+              width={120}
+              height={40}
+              className="h-6 w-auto object-contain"
+            />
+          </li>
+        ))}
       </ul>
 
       {note && <p className="mt-3 text-xs text-mist">{note}</p>}

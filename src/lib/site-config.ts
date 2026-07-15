@@ -50,11 +50,13 @@ export const siteConfig = {
   // según los medios reales de la empresa.
   payments: {
     note: "Elige tu medio de pago preferido al confirmar la cotización.",
+    // `label` sigue siendo la fuente del texto accesible (alt/title) aunque en
+    // pantalla se muestre el logo de cada entidad.
     methods: [
-      { id: "nequi", label: "Nequi" },
-      { id: "bold", label: "Bold · Tarjeta débito y crédito" },
-      { id: "daviplata", label: "Daviplata" },
-      { id: "davivienda", label: "Davivienda" },
+      { id: "nequi", label: "Nequi", logo: "/pagos/nequi.webp" },
+      { id: "bold", label: "Bold · Tarjeta débito y crédito", logo: "/pagos/bold.png" },
+      { id: "daviplata", label: "Daviplata", logo: "/pagos/daviplata.png" },
+      { id: "davivienda", label: "Davivienda", logo: "/pagos/davivienda.webp" },
     ],
   },
 

@@ -19,24 +19,57 @@ const WORK_GALLERY: { type: "image" | "video"; src: string; poster?: string; alt
   { type: "image", src: "/galeria/instalacion-2.jpeg", alt: "Perforación del riel a la altura del marco" },
 ];
 
-/** Capturas de conversaciones reales (`public/testimonios`). */
+/**
+ * Capturas de conversaciones reales (`public/testimonios`).
+ * `width`/`height` = tamaño real del archivo; se muestran a tamaño nativo como
+ * máximo porque son capturas pequeñas y estirarlas las emborrona.
+ */
 const WHATSAPP_PROOF = [
-  { src: "/testimonios/whatsapp-1.png", alt: "Cliente comparte foto de sus cortinas instaladas y agradece el trabajo" },
-  { src: "/testimonios/whatsapp-2.png", alt: "Cliente destaca la calidad y coordina una nueva entrega" },
-  { src: "/testimonios/whatsapp-3.png", alt: "Cliente felicita al equipo por el compromiso y el resultado" },
+  {
+    src: "/testimonios/whatsapp-1.png",
+    alt: "Cliente comparte foto de sus cortinas instaladas y agradece el trabajo",
+    width: 329,
+    height: 253,
+  },
+  {
+    src: "/testimonios/whatsapp-2.png",
+    alt: "Cliente destaca la calidad y coordina una nueva entrega",
+    width: 270,
+    height: 312,
+  },
+  {
+    src: "/testimonios/whatsapp-3.png",
+    alt: "Cliente felicita al equipo por el compromiso y el resultado",
+    width: 260,
+    height: 194,
+  },
 ];
 
-// Marcadores de posición mientras no haya reseñas reales aprobadas.
-const placeholders = [
-  { authorName: "Cliente satisfecho", comment: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
-  { authorName: "Cliente satisfecho", comment: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
-  { authorName: "Cliente satisfecho", comment: "Espacio reservado para el testimonio real del cliente.", rating: 5 },
+/**
+ * Mientras no haya reseñas aprobadas en el panel, se destacan mensajes REALES
+ * que los clientes enviaron por WhatsApp. Están transcritos literalmente de las
+ * capturas que se muestran más abajo en esta misma sección, así que cualquiera
+ * puede contrastarlos — que es justo lo que les da credibilidad.
+ *
+ * No llevan estrellas: quien escribió estos mensajes nunca puso una
+ * calificación, y ponérsela nosotros sería inventarla.
+ */
+const REAL_QUOTES = [
+  { comment: "Quedaron super lindas.", author: "Cliente en Bogotá" },
+  {
+    comment: "Buena calidad. Tengo otros apartamentos para temas de cortinería.",
+    author: "Cliente en Bogotá",
+  },
+  {
+    comment: "Quiero felicitarte por tu arduo compromiso. Muy hermosas, muchas gracias.",
+    author: "Cliente en Bogotá",
+  },
 ];
 
 export async function SocialProof() {
   const { reviews, average, count } = await getApprovedReviews(6);
-  const testimonials = reviews.length > 0 ? reviews : placeholders;
-  const displayAvg = average != null ? average.toFixed(1) : "5.0";
+  // Sin reseñas aprobadas todavía se muestran los mensajes reales de WhatsApp.
+  const hasReviews = reviews.length > 0;
 
   return (
     <section id="referencias" className="scroll-mt-24 py-20 md:py-28">
@@ -47,41 +80,69 @@ export async function SocialProof() {
           subtitle="Testimonios, trabajos realizados y valoraciones de quienes ya confían en Cortinería Nacional."
         />
 
-        {/* Resumen de calificación */}
-        <Reveal className="mt-12">
-          <div id="calificaciones" className="card-premium mx-auto flex max-w-lg scroll-mt-24 flex-col items-center gap-3 p-8 text-center">
-            <div className="flex items-center gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="h-6 w-6 fill-naranja text-naranja" />
-              ))}
+        {/* Resumen de calificación — solo cuando hay opiniones que promediar.
+            Antes se pintaba un 5.0 con cinco estrellas incluso con cero
+            opiniones, que es una nota que nadie ha puesto. */}
+        {count > 0 && average != null && (
+          <Reveal className="mt-12">
+            <div id="calificaciones" className="card-premium mx-auto flex max-w-lg scroll-mt-24 flex-col items-center gap-3 p-8 text-center">
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={
+                      i < Math.round(average)
+                        ? "h-6 w-6 fill-naranja text-naranja"
+                        : "h-6 w-6 text-mist-2"
+                    }
+                  />
+                ))}
+              </div>
+              <p className="font-display text-4xl font-semibold text-cloud">{average.toFixed(1)}</p>
+              <p className="text-sm text-mist">
+                Calificación promedio · {count} {count === 1 ? "opinión" : "opiniones"}
+              </p>
             </div>
-            <p className="font-display text-4xl font-semibold text-cloud">{displayAvg}</p>
-            <p className="text-sm text-mist">
-              {count > 0
-                ? `Calificación promedio · ${count} ${count === 1 ? "opinión" : "opiniones"}`
-                : "Calificación promedio · Opiniones verificadas próximamente"}
-            </p>
-          </div>
-        </Reveal>
+          </Reveal>
+        )}
 
         {/* Testimonios */}
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <Reveal key={i} delay={i * 0.08}>
-              <figure className="card-premium h-full p-6">
-                <Quote className="h-7 w-7 text-morado-light/60" />
-                <blockquote className="mt-4 text-sm leading-relaxed text-mist">“{t.comment}”</blockquote>
-                <figcaption className="mt-5 flex items-center justify-between">
-                  <span className="text-sm font-medium text-cloud">{t.authorName}</span>
-                  <span className="flex gap-0.5">
-                    {Array.from({ length: t.rating }).map((_, s) => (
-                      <Star key={s} className="h-3.5 w-3.5 fill-naranja text-naranja" />
-                    ))}
-                  </span>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
+          {hasReviews
+            ? reviews.map((t, i) => (
+                <Reveal key={i} delay={i * 0.08}>
+                  <figure className="card-premium h-full p-6">
+                    <Quote className="h-7 w-7 text-morado-light/60" />
+                    <blockquote className="mt-4 text-sm leading-relaxed text-mist">
+                      “{t.comment}”
+                    </blockquote>
+                    <figcaption className="mt-5 flex items-center justify-between">
+                      <span className="text-sm font-medium text-cloud">{t.authorName}</span>
+                      <span className="flex gap-0.5">
+                        {Array.from({ length: t.rating }).map((_, s) => (
+                          <Star key={s} className="h-3.5 w-3.5 fill-naranja text-naranja" />
+                        ))}
+                      </span>
+                    </figcaption>
+                  </figure>
+                </Reveal>
+              ))
+            : REAL_QUOTES.map((t, i) => (
+                <Reveal key={i} delay={i * 0.08}>
+                  <figure className="card-premium h-full p-6">
+                    <Quote className="h-7 w-7 text-morado-light/60" />
+                    <blockquote className="mt-4 text-sm leading-relaxed text-mist">
+                      “{t.comment}”
+                    </blockquote>
+                    <figcaption className="mt-5 flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-cloud">{t.author}</span>
+                      <span className="inline-flex shrink-0 items-center gap-1 text-[11px] text-mist-2">
+                        <MessageSquare className="h-3 w-3" /> Por WhatsApp
+                      </span>
+                    </figcaption>
+                  </figure>
+                </Reveal>
+              ))}
         </div>
 
         {/* Galería de trabajos realizados */}
@@ -153,14 +214,17 @@ export async function SocialProof() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {WHATSAPP_PROOF.map((shot, i) => (
               <Reveal key={shot.src} delay={i * 0.06}>
-                <figure className="card-premium h-full p-3">
+                <figure className="card-premium flex h-full items-center justify-center p-3">
                   <Image
                     src={shot.src}
                     alt={shot.alt}
-                    width={640}
-                    height={480}
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="w-full rounded-xl"
+                    width={shot.width}
+                    height={shot.height}
+                    // Igual que la guía de medición: PNG pequeño y sin pérdida,
+                    // servido tal cual y sin pasar de su tamaño nativo.
+                    unoptimized
+                    style={{ maxWidth: shot.width }}
+                    className="h-auto w-full rounded-xl"
                   />
                 </figure>
               </Reveal>

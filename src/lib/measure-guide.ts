@@ -17,6 +17,9 @@ export type MeasureImage = {
   src: string;
   alt: string;
   caption: string;
+  /** Tamaño REAL del archivo. Declararlo mal hace que Next reescale y desenfoque. */
+  width: number;
+  height: number;
 };
 
 export const ANCHO_CASOS: MeasureCase[] = [
@@ -55,27 +58,41 @@ export const ALTO_CASOS: MeasureCase[] = [
   },
 ];
 
-/** Ilustraciones oficiales de medición (`public/medir`). */
+/**
+ * Ilustraciones oficiales de medición (`public/medir`).
+ *
+ * `width`/`height` son las dimensiones reales de cada archivo. Importan: son
+ * capturas pequeñas, así que se muestran a tamaño nativo como máximo. Estirarlas
+ * para llenar la columna las vuelve borrosas — no hay más detalle que inventar.
+ */
 export const MEASURE_IMAGES: MeasureImage[] = [
   {
     src: "/medir/ancho-entre-paredes.png",
     alt: "Ventana entre paredes: el ancho de la cortina es X menos 0,5 cm",
     caption: "Ventana entre paredes — Ancho = X − 0,5 cm",
+    width: 416,
+    height: 381,
   },
   {
     src: "/medir/ancho-libre-un-lado.png",
     alt: "Ventana libre a un lado: el ancho es X más 10 cm, con las dos formas de medir la altura",
     caption: "Libre a un lado — Ancho = X + 10 cm · Altura según el techo",
+    width: 376,
+    height: 525,
   },
   {
     src: "/medir/ancho-libre-ambos-lados.png",
     alt: "Ventana libre a ambos lados: el ancho es X más 20 cm, con las dos formas de medir la altura",
     caption: "Libre a ambos lados — Ancho = X + 20 cm · Altura según el techo",
+    width: 391,
+    height: 526,
   },
   {
     src: "/medir/sin-metro-usa-tu-cuerpo.png",
     alt: "Referencias del cuerpo para estimar medidas sin metro: dedo 2 cm, palma 10 cm, antebrazo 45 cm, paso 70 a 80 cm",
     caption: "¿No tienes metro? Usa tu cuerpo como referencia aproximada",
+    width: 944,
+    height: 228,
   },
 ];
 

@@ -99,10 +99,14 @@ export default function ComoMedirPage() {
                   <Image
                     src={img.src}
                     alt={img.alt}
-                    width={1000}
-                    height={1000}
-                    sizes="(min-width: 768px) 50vw, 100vw"
-                    className="h-auto w-full"
+                    width={img.width}
+                    height={img.height}
+                    // Sin optimizar y sin pasar del tamaño nativo: son PNG pequeños
+                    // y ya sin pérdida; reencodificarlos o estirarlos solo los
+                    // emborrona.
+                    unoptimized
+                    style={{ maxWidth: img.width }}
+                    className="mx-auto h-auto w-full"
                   />
                   <figcaption className="border-t border-line/60 px-4 py-3 text-center text-xs text-mist-2">
                     {img.caption}

@@ -140,10 +140,11 @@ export function MeasureGuideButton({
             <Image
               src={img.src}
               alt={img.alt}
-              width={1000}
-              height={1000}
-              sizes="26rem"
-              className="h-auto w-full"
+              width={img.width}
+              height={img.height}
+              unoptimized
+              style={{ maxWidth: img.width }}
+              className="mx-auto h-auto w-full"
             />
             <figcaption className="border-t border-line/60 px-3 py-2 text-center text-[11px] text-mist-2">
               {img.caption}
