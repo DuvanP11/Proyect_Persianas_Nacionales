@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { NotificationBell, type BellItem } from "@/components/admin/NotificationBell";
 import { Logo } from "@/components/layout/Logo";
 import { requireAdmin } from "@/lib/auth";
-import { listNotifications, unreadCount } from "@/lib/notifications";
+import { formatWhen, listNotifications, unreadCount } from "@/lib/notifications";
 import {
   logoutAction,
   markAllNotificationsReadAction,
@@ -23,18 +23,6 @@ const NAV = [
 
 /** Solo visible para ADMIN: da de alta los ingresos del equipo. */
 const OWNER_NAV = [{ href: "/admin/empleados", label: "Empleados", icon: "☰" }];
-
-const relativeTime = new Intl.RelativeTimeFormat("es-CO", { numeric: "auto" });
-
-/** "hace 5 minutos" — se calcula en el servidor para que no baile al hidratar. */
-function formatWhen(date: Date): string {
-  const diffMs = date.getTime() - Date.now();
-  const mins = Math.round(diffMs / 60_000);
-  if (Math.abs(mins) < 60) return relativeTime.format(mins, "minute");
-  const hours = Math.round(mins / 60);
-  if (Math.abs(hours) < 24) return relativeTime.format(hours, "hour");
-  return relativeTime.format(Math.round(hours / 24), "day");
-}
 
 export default async function PanelLayout({
   children,

@@ -23,6 +23,20 @@ export type NotificationRow = {
   createdAt: Date;
 };
 
+const relativeTime = new Intl.RelativeTimeFormat("es-CO", { numeric: "auto" });
+
+/**
+ * "hace 5 minutos". Se resuelve siempre en el servidor —tanto para el panel como
+ * para la campana del sitio— para que el texto no baile al hidratar.
+ */
+export function formatWhen(date: Date): string {
+  const mins = Math.round((date.getTime() - Date.now()) / 60_000);
+  if (Math.abs(mins) < 60) return relativeTime.format(mins, "minute");
+  const hours = Math.round(mins / 60);
+  if (Math.abs(hours) < 24) return relativeTime.format(hours, "hour");
+  return relativeTime.format(Math.round(hours / 24), "day");
+}
+
 /** Roles que reciben notificaciones de trabajo. */
 const STAFF_ROLES = ["ADMIN", "STAFF"] as const;
 

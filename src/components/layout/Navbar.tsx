@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, User, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { SiteNotificationBell } from "@/components/admin/SiteNotificationBell";
 import { CartMenu } from "@/components/cart/CartMenu";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { Logo } from "./Logo";
@@ -90,12 +91,15 @@ export function Navbar() {
             WhatsApp
           </Button>
           <ThemeSwitcher />
+          {/* Solo se pinta si hay sesión de admin o asesor. */}
+          <SiteNotificationBell />
           <CartMenu />
         </div>
 
-        {/* Tema + carrito + menú móvil */}
+        {/* Tema + notificaciones + carrito + menú móvil */}
         <div className="flex items-center gap-0.5 lg:hidden">
           <ThemeSwitcher />
+          <SiteNotificationBell />
           <CartMenu />
           <button
             type="button"
