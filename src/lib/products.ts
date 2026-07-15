@@ -37,6 +37,17 @@ export interface Product {
   category?: ProductCategory | null;
 }
 
+/**
+ * Fotografías reales de cada línea, en `public/catalog/<slug>/01.jpg`…
+ * Se numeran de forma correlativa, así que basta con indicar cuántas hay.
+ */
+function fotos(slug: string, cantidad: number): string[] {
+  return Array.from(
+    { length: cantidad },
+    (_, i) => `/catalog/${slug}/${String(i + 1).padStart(2, "0")}.jpg`,
+  );
+}
+
 export const products: Product[] = [
   {
     slug: "blackout",
@@ -59,7 +70,7 @@ export const products: Product[] = [
     pricePerMeter: 55000,
     productionTime: "3 a 5 días hábiles",
     features: ["Bloqueo total de luz", "Protección UV 100%", "Aislamiento térmico", "Reduce el ruido"],
-    images: ["/catalog/blackout.jpg"],
+    images: [...fotos("blackout", 8), "/catalog/blackout.jpg"],
     videos: [],
     gradient: "from-slate-800 via-slate-700 to-slate-900",
     featured: true,
@@ -83,7 +94,7 @@ export const products: Product[] = [
     pricePerMeter: 89000,
     productionTime: "4 a 6 días hábiles",
     features: ["Luz graduable", "Privacidad de día", "Acabado premium", "Look moderno"],
-    images: ["/catalog/sheer-elegance.jpg"],
+    images: [...fotos("sheer-elegance", 17), "/catalog/sheer-elegance.jpg"],
     videos: [],
     gradient: "from-zinc-300 via-zinc-200 to-zinc-400",
     featured: true,
@@ -106,7 +117,10 @@ export const products: Product[] = [
     pricePerMeter: 119000,
     productionTime: "5 a 7 días hábiles",
     features: ["Día y noche", "Un solo mecanismo", "Máxima versatilidad", "Diseño elegante"],
-    images: ["/catalog/sistema-2en1.jpg"],
+    images: [
+      ...fotos("sistema-2-en-1-sheer-elegance", 1),
+      "/catalog/sistema-2en1.jpg",
+    ],
     videos: [],
     gradient: "from-stone-400 via-stone-300 to-stone-500",
     featured: true,
@@ -132,7 +146,7 @@ export const products: Product[] = [
     pricePerMeter: 48000,
     productionTime: "3 a 5 días hábiles",
     features: ["Ideal para ventanales", "Luz graduable", "Siete colores", "Look profesional"],
-    images: ["/catalog/persianas-verticales.jpg"],
+    images: [...fotos("persianas-verticales", 23), "/catalog/persianas-verticales.jpg"],
     videos: [],
     gradient: "from-neutral-600 via-neutral-500 to-neutral-700",
   },
@@ -157,7 +171,7 @@ export const products: Product[] = [
     pricePerMeter: 72000,
     productionTime: "4 a 6 días hábiles",
     features: ["Protección UV", "Reduce el calor", "Conserva la vista", "Uso comercial"],
-    images: ["/catalog/persianas-screen.jpg"],
+    images: [...fotos("persianas-screen", 5), "/catalog/persianas-screen.jpg"],
     videos: [],
     gradient: "from-gray-600 via-gray-500 to-gray-700",
   },
@@ -179,7 +193,7 @@ export const products: Product[] = [
     pricePerMeter: 98000,
     productionTime: "5 a 7 días hábiles",
     features: ["Grandes ventanales", "Divisor de ambientes", "Estilo minimalista", "Deslizamiento suave"],
-    images: ["/catalog/panel-japones.jpg"],
+    images: [...fotos("panel-japones", 7), "/catalog/panel-japones.jpg"],
     videos: [],
     gradient: "from-zinc-500 via-zinc-400 to-zinc-600",
   },
@@ -226,7 +240,7 @@ export const products: Product[] = [
     pricePerMeter: 84000,
     productionTime: "5 a 8 días hábiles",
     features: ["Ondas modernas", "Textura artesanal", "Caída elegante", "Estilo con carácter"],
-    images: ["/catalog/hanas-vintage.jpg"],
+    images: [...fotos("hanas-vintage", 49), "/catalog/hanas-vintage.jpg"],
     videos: [],
     gradient: "from-amber-800 via-amber-700 to-stone-800",
   },
@@ -250,7 +264,7 @@ export const products: Product[] = [
     pricePerMeter: 65000,
     productionTime: "4 a 7 días hábiles",
     features: ["Confección a medida", "Telas nobles", "Pliegue francés / onda", "Colecciones Brisa y Luxury"],
-    images: ["/catalog/cortinas-tradicionales.jpg"],
+    images: [...fotos("cortinas-tradicionales", 7), "/catalog/cortinas-tradicionales.jpg"],
     videos: [],
     gradient: "from-rose-950 via-rose-900 to-slate-900",
   },

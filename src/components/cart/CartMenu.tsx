@@ -157,8 +157,9 @@ export function CartMenu({ className }: { className?: string }) {
                           <span>{it.fabric}</span>
                         </p>
                         <p className="mt-0.5 text-xs text-mist-2">
-                          Cantidad: <span className="text-cloud">{it.quantity}</span> · Metros:{" "}
-                          <span className="text-cloud">{formatMeters(it.meters)} m</span>
+                          Cantidad: <span className="text-cloud">{it.quantity}</span> · Ancho:{" "}
+                          <span className="text-cloud">{formatMeters(it.widthM)} m</span> · Alto:{" "}
+                          <span className="text-cloud">{formatMeters(it.heightM)} m</span>
                         </p>
                       </div>
                     </li>

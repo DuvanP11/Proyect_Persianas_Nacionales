@@ -1,4 +1,5 @@
-import { Star, Quote, ImageIcon, MessageSquare } from "lucide-react";
+import Image from "next/image";
+import { Star, Quote, ImageIcon, MessageSquare, PlayCircle } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { getApprovedReviews } from "@/lib/reviews";
@@ -8,6 +9,22 @@ import { getApprovedReviews } from "@/lib/reviews";
  * Muestra las reseñas aprobadas desde la base de datos (gestionadas en el panel).
  * Si todavía no hay reseñas, cae a marcadores de posición elegantes.
  */
+
+/** Fotos y videos de instalaciones reales (`public/galeria`). */
+const WORK_GALLERY: { type: "image" | "video"; src: string; poster?: string; alt: string }[] = [
+  { type: "video", src: "/galeria/instalacion-1.mp4", poster: "/galeria/instalacion-1.jpeg", alt: "Instalación de riel en ventana de sala" },
+  { type: "video", src: "/galeria/instalacion-2.mp4", poster: "/galeria/instalacion-2.jpeg", alt: "Montaje de soportes sobre el marco" },
+  { type: "video", src: "/galeria/instalacion-3.mp4", alt: "Instalación terminada en vivienda" },
+  { type: "image", src: "/galeria/instalacion-1.jpeg", alt: "Nuestro técnico fijando el soporte al muro" },
+  { type: "image", src: "/galeria/instalacion-2.jpeg", alt: "Perforación del riel a la altura del marco" },
+];
+
+/** Capturas de conversaciones reales (`public/testimonios`). */
+const WHATSAPP_PROOF = [
+  { src: "/testimonios/whatsapp-1.png", alt: "Cliente comparte foto de sus cortinas instaladas y agradece el trabajo" },
+  { src: "/testimonios/whatsapp-2.png", alt: "Cliente destaca la calidad y coordina una nueva entrega" },
+  { src: "/testimonios/whatsapp-3.png", alt: "Cliente felicita al equipo por el compromiso y el resultado" },
+];
 
 // Marcadores de posición mientras no haya reseñas reales aprobadas.
 const placeholders = [
@@ -67,22 +84,88 @@ export async function SocialProof() {
           ))}
         </div>
 
-        {/* Galería de trabajos + capturas de WhatsApp (placeholder) */}
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <Reveal>
-            <div className="card-premium flex h-48 flex-col items-center justify-center gap-3 border-dashed p-6 text-center">
-              <ImageIcon className="h-8 w-8 text-mist-2" />
-              <p className="text-sm text-mist">Galería de trabajos realizados</p>
-              <p className="text-xs text-mist-2">Espacio preparado para tus fotografías</p>
+        {/* Galería de trabajos realizados */}
+        <div className="mt-16">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-morado/15 text-morado-light">
+              <ImageIcon className="h-5 w-5" />
+            </span>
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-cloud">
+                Galería de trabajos realizados
+              </h3>
+              <p className="text-sm text-mist">
+                Instalaciones reales de nuestro equipo en casas de Bogotá.
+              </p>
             </div>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <div className="card-premium flex h-48 flex-col items-center justify-center gap-3 border-dashed p-6 text-center">
-              <MessageSquare className="h-8 w-8 text-mist-2" />
-              <p className="text-sm text-mist">Conversaciones de clientes satisfechos</p>
-              <p className="text-xs text-mist-2">Espacio preparado para tus capturas de WhatsApp</p>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {WORK_GALLERY.map((item, i) => (
+              <Reveal key={item.src} delay={i * 0.06}>
+                <figure className="card-premium h-full overflow-hidden">
+                  <div className="relative aspect-[3/4] bg-ink-soft">
+                    {item.type === "video" ? (
+                      <video
+                        src={item.src}
+                        poster={item.poster}
+                        controls
+                        preload="metadata"
+                        playsInline
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={item.src}
+                        alt={item.alt}
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
+                  <figcaption className="flex items-center gap-2 px-4 py-3 text-xs text-mist">
+                    {item.type === "video" && <PlayCircle className="h-3.5 w-3.5 text-morado-light" />}
+                    {item.alt}
+                  </figcaption>
+                </figure>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* Conversaciones de clientes satisfechos */}
+        <div className="mt-16">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-naranja/15 text-naranja-light">
+              <MessageSquare className="h-5 w-5" />
+            </span>
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-cloud">
+                Conversaciones de clientes satisfechos
+              </h3>
+              <p className="text-sm text-mist">
+                Mensajes tal como nos llegaron por WhatsApp al terminar la instalación.
+              </p>
             </div>
-          </Reveal>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {WHATSAPP_PROOF.map((shot, i) => (
+              <Reveal key={shot.src} delay={i * 0.06}>
+                <figure className="card-premium h-full p-3">
+                  <Image
+                    src={shot.src}
+                    alt={shot.alt}
+                    width={640}
+                    height={480}
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="w-full rounded-xl"
+                  />
+                </figure>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Ruler, ArrowRight, MoveHorizontal, MoveVertical } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
-import { DiagramAncho, DiagramAlto } from "@/components/como-medir/MeasureDiagrams";
+import {
+  ALTO_CASOS,
+  ANCHO_CASOS,
+  MEASURE_IMAGES,
+  MEASURE_TIP,
+} from "@/lib/measure-guide";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -11,18 +17,6 @@ export const metadata: Metadata = {
   description:
     "Guía paso a paso para medir correctamente tus ventanas antes de cotizar tus cortinas o persianas: ancho, alto y las holguras recomendadas.",
 };
-
-const anchoCasos = [
-  { caso: "Ventana entre paredes", formula: "Ancho = X − 0.5 cm", nota: "Descuenta medio centímetro para que la cortina entre justa entre las dos paredes." },
-  { caso: "Ventana libre a un lado", formula: "Ancho = X + 10 cm", nota: "Suma 10 cm hacia el lado libre para cubrir bien la ventana." },
-  { caso: "Ventana libre a ambos lados", formula: "Ancho = X + 20 cm", nota: "Suma 10 cm a cada lado (20 cm en total) para una mejor cobertura." },
-];
-
-const altoCasos = [
-  { caso: "Ventana desde el techo", formula: "Alto = Y + 15 cm", nota: "Suma 15 cm para el soporte arriba y una caída elegante debajo del marco." },
-  { caso: "Ventana separada del techo", formula: "Alto = Y + 20 cm", nota: "Suma 20 cm cuando hay espacio entre el techo y la ventana." },
-  { caso: "Ventana que va hasta el piso", formula: "Alto = Y − 3 cm", nota: "Descuenta 3 cm para que la cortina no arrastre ni roce el piso." },
-];
 
 export default function ComoMedirPage() {
   return (
@@ -56,7 +50,7 @@ export default function ComoMedirPage() {
             Mide el ancho de la ventana y aplica la holgura según su ubicación:
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {anchoCasos.map((c) => (
+            {ANCHO_CASOS.map((c) => (
               <Reveal key={c.caso}>
                 <div className="card-premium h-full p-5">
                   <p className="text-sm font-medium text-cloud">{c.caso}</p>
@@ -80,7 +74,7 @@ export default function ComoMedirPage() {
             Mide la altura y ten en cuenta si la ventana llega o no hasta el piso:
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {altoCasos.map((c) => (
+            {ALTO_CASOS.map((c) => (
               <Reveal key={c.caso}>
                 <div className="card-premium h-full p-5">
                   <p className="text-sm font-medium text-cloud">{c.caso}</p>
@@ -92,37 +86,37 @@ export default function ComoMedirPage() {
           </div>
         </section>
 
-        {/* Diagramas */}
+        {/* Ilustraciones oficiales */}
         <section className="mt-14">
-          <h2 className="font-display text-2xl font-semibold text-cloud">Diagramas de referencia</h2>
+          <h2 className="font-display text-2xl font-semibold text-cloud">Guía visual paso a paso</h2>
           <p className="mt-2 max-w-2xl text-sm text-mist">
-            Así se toman las dos medidas clave de cada ventana.
+            Identifica tu tipo de ventana y sigue la ilustración que corresponda.
           </p>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <Reveal>
-              <figure className="rounded-3xl border border-line bg-surface/40 p-5">
-                <DiagramAncho />
-                <figcaption className="mt-3 text-center text-xs text-mist">
-                  Mide de un extremo a otro y suma la holgura según el tipo de ventana.
-                </figcaption>
-              </figure>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <figure className="rounded-3xl border border-line bg-surface/40 p-5">
-                <DiagramAlto />
-                <figcaption className="mt-3 text-center text-xs text-mist">
-                  Mide la altura; suma para el soporte o resta 3 cm si va hasta el piso.
-                </figcaption>
-              </figure>
-            </Reveal>
+            {MEASURE_IMAGES.map((img, i) => (
+              <Reveal key={img.src} delay={i * 0.06}>
+                <figure className="overflow-hidden rounded-3xl border border-line bg-white">
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    width={1000}
+                    height={1000}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="h-auto w-full"
+                  />
+                  <figcaption className="border-t border-line/60 px-4 py-3 text-center text-xs text-mist-2">
+                    {img.caption}
+                  </figcaption>
+                </figure>
+              </Reveal>
+            ))}
           </div>
         </section>
 
         {/* Tip */}
         <div className="mt-10 rounded-2xl border border-morado/25 bg-morado/[0.06] p-5 text-sm text-mist">
-          <span className="font-medium text-cloud">Tip:</span> mide el ancho en tres puntos (arriba,
-          centro y abajo) y usa la medida menor. Registra <span className="text-cloud">ancho × alto</span>{" "}
-          de cada ventana en centímetros y envíanoslos para darte una cotización precisa.
+          <span className="font-medium text-cloud">Tip:</span> {MEASURE_TIP} Envíanoslas y te damos
+          una cotización precisa.
         </div>
 
         {/* CTA */}

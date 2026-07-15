@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
+import { Check, Minus, MoveHorizontal, MoveVertical, Plus, ShoppingBag } from "lucide-react";
+import { MeasureGuideButton } from "@/components/catalog/MeasureGuideButton";
 import { useCart } from "@/components/cart/CartContext";
 import {
   colorOptionsFor,
@@ -43,9 +44,12 @@ export function ProductConfigurator({
   const [colorIdx, setColorIdx] = useState(0);
   const [fabric, setFabric] = useState(() => defaultFabricFor(product.name, product.tela));
   const [quantity, setQuantity] = useState(1);
-  const [meters, setMeters] = useState("");
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
+  // Paso obligatorio: sin confirmar la guía de medición no se agrega al carrito.
+  const [measureConfirmed, setMeasureConfirmed] = useState(false);
 
   const color = colors[colorIdx] ?? colors[0];
 
@@ -53,12 +57,19 @@ export function ProductConfigurator({
   const inc = () => setQuantity((q) => Math.min(999, q + 1));
 
   function handleAdd() {
-    const metersNum = parseFloat(meters.replace(",", "."));
+    const widthNum = parseFloat(width.replace(",", "."));
+    const heightNum = parseFloat(height.replace(",", "."));
     if (!design) return setError("Selecciona un diseño.");
     if (!color) return setError("Selecciona un color.");
     if (!fabric) return setError("Selecciona la tela.");
-    if (!Number.isFinite(metersNum) || metersNum <= 0) {
-      return setError("Indica los metros requeridos (mayor a 0).");
+    if (!Number.isFinite(widthNum) || widthNum <= 0) {
+      return setError("Indica el ancho en metros (mayor a 0).");
+    }
+    if (!Number.isFinite(heightNum) || heightNum <= 0) {
+      return setError("Indica el alto en metros (mayor a 0).");
+    }
+    if (!measureConfirmed) {
+      return setError('Antes de continuar abre "¿Cómo tomar medidas?" y confirma que ya sabes medir.');
     }
     setError(null);
 
@@ -71,7 +82,8 @@ export function ProductConfigurator({
       colorHex: color.hex,
       fabric,
       quantity,
-      meters: metersNum,
+      widthM: widthNum,
+      heightM: heightNum,
     });
 
     setAdded(true);
@@ -83,6 +95,10 @@ export function ProductConfigurator({
   const selectCls =
     "w-full rounded-xl border border-line bg-white/[0.03] px-3.5 py-2.5 text-sm text-cloud " +
     "outline-none transition-colors focus:border-morado/60 focus:bg-white/[0.05]";
+  const measureInputCls =
+    "h-11 w-full rounded-xl border border-line bg-white/[0.03] px-3.5 pr-9 text-sm text-cloud " +
+    "outline-none transition-colors focus:border-morado/60 focus:bg-white/[0.05] " +
+    "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
 
   return (
     <div className={cn(variant === "page" && "rounded-2xl border border-line bg-white/[0.02] p-5")}>
@@ -200,24 +216,67 @@ export function ProductConfigurator({
         </div>
 
         <div>
-          <label htmlFor={`meters-${product.slug}`} className={labelCls}>
-            Metros
+          <label htmlFor={`width-${product.slug}`} className={labelCls}>
+            <span className="inline-flex items-center gap-1">
+              <MoveHorizontal className="h-3.5 w-3.5 text-morado-light" /> Ancho de la ventana
+            </span>
           </label>
           <div className="relative">
             <input
-              id={`meters-${product.slug}`}
+              id={`width-${product.slug}`}
               type="number"
               inputMode="decimal"
               min={0}
-              step="0.25"
+              step="0.05"
               placeholder="Ej: 3.25"
-              value={meters}
-              onChange={(e) => setMeters(e.target.value)}
-              className="h-11 w-full rounded-xl border border-line bg-white/[0.03] px-3.5 pr-9 text-sm text-cloud outline-none transition-colors focus:border-morado/60 focus:bg-white/[0.05] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              value={width}
+              onChange={(e) => setWidth(e.target.value)}
+              className={measureInputCls}
             />
             <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-xs text-mist-2">
               m
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Alto */}
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor={`height-${product.slug}`} className={labelCls}>
+            <span className="inline-flex items-center gap-1">
+              <MoveVertical className="h-3.5 w-3.5 text-naranja-light" /> Alto de la ventana
+            </span>
+          </label>
+          <div className="relative">
+            <input
+              id={`height-${product.slug}`}
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.05"
+              placeholder="Ej: 2.40"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              className={measureInputCls}
+            />
+            <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-xs text-mist-2">
+              m
+            </span>
+          </div>
+        </div>
+
+        {/* Guía de medición: paso obligatorio antes de agregar al carrito. */}
+        <div className="flex items-end">
+          <div className="w-full">
+            <MeasureGuideButton
+              confirmed={measureConfirmed}
+              placement={variant === "compact" ? "overlay" : "anchored"}
+              onConfirm={() => {
+                setMeasureConfirmed(true);
+                setError(null);
+              }}
+            />
           </div>
         </div>
       </div>
@@ -246,6 +305,9 @@ export function ProductConfigurator({
           added
             ? "bg-[#25D366] shadow-[#25D366]/30"
             : "bg-gradient-to-r from-morado to-naranja shadow-morado/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-morado/40",
+          // Atenuado mientras falte confirmar la guía; sigue pulsable para que
+          // el clic explique el motivo en vez de dejar un botón muerto.
+          !added && !measureConfirmed && "opacity-60 shadow-none hover:translate-y-0",
         )}
       >
         <AnimatePresence mode="wait" initial={false}>

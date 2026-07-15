@@ -11,7 +11,9 @@ import {
 } from "react";
 import { cartCount, type CartItem } from "@/lib/cart";
 
-const STORAGE_KEY = "cn_cart_v1";
+// v2: las líneas pasaron de un único `meters` a `widthM` + `heightM`. Cambiar la
+// clave descarta los carritos viejos en vez de mostrarlos con medidas vacías.
+const STORAGE_KEY = "cn_cart_v2";
 
 interface CartContextValue {
   items: CartItem[];

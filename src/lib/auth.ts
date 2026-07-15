@@ -94,6 +94,18 @@ export async function requireAdmin(): Promise<Session> {
   return session;
 }
 
+/**
+ * Gate para lo que solo puede tocar un administrador (gestión de empleados).
+ * Un asesor (STAFF) con sesión válida entra al panel pero no aquí.
+ */
+export async function requireOwner(): Promise<Session> {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") {
+    redirect("/admin");
+  }
+  return session;
+}
+
 /** Gate para el portal del cliente. Redirige a /cuenta/ingresar si no hay sesión válida. */
 export async function requireCustomer(): Promise<Session> {
   const session = await getSession();

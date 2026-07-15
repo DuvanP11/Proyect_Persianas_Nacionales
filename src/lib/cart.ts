@@ -25,8 +25,10 @@ export interface CartItem {
   colorHex?: string;
   fabric: string;
   quantity: number;
-  /** Metros lineales requeridos (admite decimales). */
-  meters: number;
+  /** Ancho de la ventana en metros (admite decimales). */
+  widthM: number;
+  /** Alto de la ventana en metros (admite decimales). */
+  heightM: number;
 }
 
 /**
@@ -120,7 +122,8 @@ export function cartToWhatsAppMessage(items: CartItem[]): string {
     lines.push(`   - Color: ${it.color}`);
     lines.push(`   - Tela: ${it.fabric}`);
     lines.push(`   - Cantidad: ${it.quantity}`);
-    lines.push(`   - Metros: ${formatMeters(it.meters)} m`);
+    lines.push(`   - Ancho: ${formatMeters(it.widthM)} m`);
+    lines.push(`   - Alto: ${formatMeters(it.heightM)} m`);
     lines.push("");
   });
 

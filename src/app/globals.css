@@ -166,7 +166,9 @@ select optgroup {
   --color-ink-soft: #ffffff;
   --color-surface: #ffffff;
   --color-surface-2: #f0f0f4;
-  --color-line: #e2e2e8;
+  /* Más marcada que en oscuro: sobre fondos casi blancos una línea de #e2e2e8
+     no llega a leerse y las tarjetas quedan flotando sin contorno. */
+  --color-line: #d4d4de;
 
   /* El texto se oscurece para mantener contraste sobre fondos claros */
   --color-cloud: #191920;    /* texto principal */
@@ -235,6 +237,52 @@ select optgroup {
   --color-naranja: #94a3b8;
   --color-naranja-light: #e2e8f0;
   --color-naranja-dark: #64748b;
+}
+
+/* ---- ACENTOS EN MODO CLARO ----
+   Los tonos "-light" de cada familia están pensados para contrastar contra el
+   fondo negro; sobre una superficie blanca quedan en 1.3:1 y desaparecen. En
+   claro se sustituyen por el tono oscuro de la misma familia, que es el que da
+   contraste contra la superficie: así los remates de título (.text-gradient-*),
+   los eyebrows, los íconos y los números del seguimiento vuelven a leerse sin
+   tocar los componentes.
+
+   El selector combina tema + acento a propósito: los bloques [data-accent] de
+   arriba tienen la misma especificidad que [data-theme] y van después, así que
+   ganarían. Con los dos atributos juntos la especificidad sube y estos mandan. */
+
+:root[data-theme="light"][data-accent="morado"] {
+  --color-morado-light: #6d28d9;
+  --color-naranja-light: #c2410c;
+}
+
+:root[data-theme="light"][data-accent="naranja"] {
+  --color-morado-light: #c2410c;
+  --color-naranja-light: #b45309;
+}
+
+:root[data-theme="light"][data-accent="rosa"] {
+  --color-morado-light: #c2325a;
+  --color-naranja-light: #be123c;
+}
+
+:root[data-theme="light"][data-accent="celeste"] {
+  --color-morado-light: #0a6fb0;
+  --color-naranja-light: #0369a1;
+}
+
+:root[data-theme="light"][data-accent="gris"] {
+  --color-morado-light: #475569;
+  --color-naranja-light: #52525b;
+}
+
+/* Los degradados de texto de marca reparten dos tonos claros; en modo claro se
+   anclan a la pareja primaria/oscura para que el remate del título tenga cuerpo
+   (caso "…tus ventanas" del CTA final, que quedaba lavanda sobre blanco). */
+:root[data-theme="light"] .text-gradient-brand {
+  background: linear-gradient(120deg, var(--color-morado-dark), var(--color-naranja-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 /* Respeta usuarios con movimiento reducido */

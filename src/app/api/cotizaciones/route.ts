@@ -53,6 +53,14 @@ async function persistQuote(data: unknown, code: string): Promise<boolean> {
         customerId: customer?.id ?? null,
       },
     });
+
+    const { notifyStaff } = await import("@/lib/notifications");
+    await notifyStaff({
+      type: "COTIZACION",
+      title: `Nueva cotización ${code}`,
+      body: `${q.nombre} ${q.apellidos} · ${q.producto} · ${q.ciudad}`,
+      href: "/admin/cotizaciones",
+    });
     return true;
   } catch (e) {
     console.error("[cotizaciones] persist error:", e);
