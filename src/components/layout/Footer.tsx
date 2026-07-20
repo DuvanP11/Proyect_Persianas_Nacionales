@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, Clock, Mail, User, Lock, ArrowRight } from "lucide-react";
+import { MapPin, Clock, Mail } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 
 // Iconos de marca (lucide v1 los removió) — SVG inline.
@@ -174,42 +174,9 @@ export function Footer() {
           />
         </div>
 
-        {/* Accesos — distingue el portal del cliente del panel del equipo */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2">
-          <Link
-            href="/cuenta"
-            className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface/50 p-5 transition-colors hover:border-morado/50"
-          >
-            <div className="flex items-center gap-4">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-morado/15 text-morado-light">
-                <User className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-mist-2">Para clientes</p>
-                <p className="font-display text-base font-semibold text-cloud">Ingreso Cliente</p>
-                <p className="text-xs text-mist">Ingresa o regístrate para ver tus cotizaciones y pedidos.</p>
-              </div>
-            </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-mist transition-transform group-hover:translate-x-1 group-hover:text-morado-light" />
-          </Link>
-
-          <Link
-            href="/admin/login"
-            className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface/50 p-5 transition-colors hover:border-naranja/50"
-          >
-            <div className="flex items-center gap-4">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-naranja/15 text-naranja-light">
-                <Lock className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-mist-2">Para el equipo</p>
-                <p className="font-display text-base font-semibold text-cloud">Admin</p>
-                <p className="text-xs text-mist">Acceso del personal a productos, pedidos e inventario.</p>
-              </div>
-            </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-mist transition-transform group-hover:translate-x-1 group-hover:text-naranja-light" />
-          </Link>
-        </div>
+        {/* Los accesos "Ingreso Cliente" y "Admin" se retiraron de aquí: ya
+            están en la barra de navegación superior y repetirlos al pie solo
+            alargaba la página sin aportar nada. */}
 
         {/* Barra inferior */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-line/60 pt-8 text-center sm:flex-row sm:text-left">

@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { getInvoice } from "@/lib/invoice-data";
 import { invoiceToUbl } from "@/lib/invoice-ubl";
+import { getFiscalSettings } from "@/lib/settings";
 
 /**
  * GET /api/facturas/<id>/xml — descarga la factura en XML.
@@ -24,7 +25,10 @@ export async function GET(
   // adelante se decide restringir la descarga solo al personal.
   await getSession();
 
-  return new Response(invoiceToUbl(invoice), {
+  // Datos fiscales vigentes (los que el administrador guardó en el panel).
+  const fiscal = await getFiscalSettings();
+
+  return new Response(invoiceToUbl(invoice, fiscal), {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
       "Content-Disposition": `attachment; filename="${invoice.number}.xml"`,

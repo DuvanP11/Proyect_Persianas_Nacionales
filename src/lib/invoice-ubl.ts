@@ -16,6 +16,7 @@
  */
 
 import { computeLine, itemDetails, type InvoiceView } from "@/lib/invoice";
+import { isFiscalReady, type FiscalSettings } from "@/lib/settings";
 import { addressLine, siteConfig } from "@/lib/site-config";
 
 /** Escapa los cinco caracteres que no pueden ir crudos en XML. */
@@ -80,8 +81,7 @@ function taxSubtotals(invoice: InvoiceView) {
 }
 
 /** Bloque `cac:Address` reutilizable para emisor y receptor. */
-function addressBlock(indent: string, line: string, cityName: string): string {
-  const f = siteConfig.fiscal;
+function addressBlock(f: FiscalSettings, indent: string, line: string, cityName: string): string {
   const i = indent;
   return `${i}<cac:Address>
 ${i}  <cbc:ID>${esc(f.cityCode)}</cbc:ID>
@@ -99,8 +99,7 @@ ${i}</cac:Address>`;
 }
 
 /** Emisor (`AccountingSupplierParty`). */
-function supplierParty(): string {
-  const f = siteConfig.fiscal;
+function supplierParty(f: FiscalSettings): string {
   return `  <cac:AccountingSupplierParty>
     <cbc:AdditionalAccountID>${esc(f.personType)}</cbc:AdditionalAccountID>
     <cac:Party>
@@ -108,13 +107,13 @@ function supplierParty(): string {
         <cbc:Name>${esc(siteConfig.name)}</cbc:Name>
       </cac:PartyName>
       <cac:PhysicalLocation>
-${addressBlock("        ", addressLine(", "), f.cityName)}
+${addressBlock(f, "        ", addressLine(", "), f.cityName)}
       </cac:PhysicalLocation>
       <cac:PartyTaxScheme>
         <cbc:RegistrationName>${esc(f.legalName)}</cbc:RegistrationName>
         <cbc:CompanyID schemeAgencyID="195" schemeAgencyName="CO, DIAN" schemeID="${esc(f.dv)}" schemeName="31">${esc(f.nit)}</cbc:CompanyID>
         <cbc:TaxLevelCode listName="No aplica">${esc(f.taxLevelCode)}</cbc:TaxLevelCode>
-${addressBlock("        ", addressLine(", "), f.cityName)}
+${addressBlock(f, "        ", addressLine(", "), f.cityName)}
         <cac:TaxScheme>
           <cbc:ID>01</cbc:ID>
           <cbc:Name>IVA</cbc:Name>
@@ -129,8 +128,7 @@ ${addressBlock("        ", addressLine(", "), f.cityName)}
 }
 
 /** Receptor (`AccountingCustomerParty`). */
-function customerParty(invoice: InvoiceView): string {
-  const f = siteConfig.fiscal;
+function customerParty(invoice: InvoiceView, f: FiscalSettings): string {
   const c = invoice.customer;
   const nombre = c ? `${c.firstName} ${c.lastName}`.trim() : "Consumidor final";
   // Sin identificación del cliente la DIAN admite "222222222222" para
@@ -144,7 +142,7 @@ function customerParty(invoice: InvoiceView): string {
         <cbc:Name>${esc(nombre)}</cbc:Name>
       </cac:PartyName>
       <cac:PhysicalLocation>
-${addressBlock("        ", c?.address ?? "", c?.city ?? f.cityName)}
+${addressBlock(f, "        ", c?.address ?? "", c?.city ?? f.cityName)}
       </cac:PhysicalLocation>
       <cac:PartyTaxScheme>
         <cbc:RegistrationName>${esc(nombre)}</cbc:RegistrationName>
@@ -216,8 +214,7 @@ function invoiceLine(item: InvoiceView["items"][number], index: number): string 
  * `fiscalReady` indica si los datos del RUT están cargados; cuando faltan, el
  * XML lleva un comentario de aviso en vez de aparentar estar listo.
  */
-export function invoiceToUbl(invoice: InvoiceView): string {
-  const f = siteConfig.fiscal;
+export function invoiceToUbl(invoice: InvoiceView, f: FiscalSettings): string {
   const issued = new Date(invoice.issuedAt);
   const subtotals = taxSubtotals(invoice);
 
@@ -235,14 +232,12 @@ export function invoiceToUbl(invoice: InvoiceView): string {
   const taxAmount = subtotals.reduce((s, t) => s + t.tax, 0);
   const lineExtension = taxExclusive;
   const taxInclusive = taxExclusive + taxAmount;
-  const fiscalReady = Boolean(f.nit && f.legalName && !f.legalName.startsWith("PENDIENTE"));
-
-  const aviso = fiscalReady
+  const aviso = isFiscalReady(f)
     ? ""
     : `
-<!-- AVISO: faltan los datos fiscales del emisor (NIT y razon social) en
-     src/lib/site-config.ts, bloque "fiscal". El documento NO es presentable
-     mientras esos campos esten vacios. -->`;
+<!-- AVISO: faltan los datos fiscales del emisor (NIT y razon social).
+     Cargalos en el panel: Admin > Configuracion > Datos fiscales.
+     El documento NO es presentable mientras esos campos esten vacios. -->`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!-- Factura electrónica UBL 2.1 — perfil DIAN Colombia.
@@ -267,8 +262,8 @@ export function invoiceToUbl(invoice: InvoiceView): string {
   <cbc:Note>${esc(invoice.notes ?? "")}</cbc:Note>
   <cbc:DocumentCurrencyCode>COP</cbc:DocumentCurrencyCode>
   <cbc:LineCountNumeric>${invoice.items.length}</cbc:LineCountNumeric>
-${supplierParty()}
-${customerParty(invoice)}
+${supplierParty(f)}
+${customerParty(invoice, f)}
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="COP">${amount(taxAmount)}</cbc:TaxAmount>
 ${subtotals
@@ -299,8 +294,4 @@ ${invoice.items.map(invoiceLine).join("\n")}
 `;
 }
 
-/** `true` si los datos fiscales del RUT ya están cargados. */
-export function isFiscalDataReady(): boolean {
-  const f = siteConfig.fiscal;
-  return Boolean(f.nit && f.legalName && !f.legalName.startsWith("PENDIENTE"));
-}
+// `isFiscalReady` vive ahora en `lib/settings`, junto a los datos que evalúa.

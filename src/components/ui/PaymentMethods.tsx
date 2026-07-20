@@ -40,29 +40,24 @@ export function PaymentMethods({
       </div>
 
       <ul className={cn("mt-3 flex flex-wrap items-center gap-2", variant === "full" && "gap-2.5")}>
-        {methods.map((m) => {
-          // Las ilustraciones casi cuadradas necesitan más alto que un
-          // wordmark para seguir siendo legibles; ver `wide` en site-config.
-          const wide = "wide" in m && m.wide === true;
-          return (
-            <li
-              key={m.id}
-              title={m.label}
-              className={cn(
-                "inline-flex items-center justify-center rounded-xl border border-line bg-white shadow-sm",
-                wide ? "h-14 px-2" : "h-10 px-3",
-              )}
-            >
-              <Image
-                src={m.logo}
-                alt={m.label}
-                width={120}
-                height={40}
-                className={cn("w-auto object-contain", wide ? "h-12" : "h-6")}
-              />
-            </li>
-          );
-        })}
+        {/* Todas las pastillas miden lo mismo: una sola altura y un solo alto
+            de logo. Cualquier imagen nueva debe recortarse con proporción
+            apaisada (~2:1) para que entre sin romper la fila. */}
+        {methods.map((m) => (
+          <li
+            key={m.id}
+            title={m.label}
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-line bg-white px-3 shadow-sm"
+          >
+            <Image
+              src={m.logo}
+              alt={m.label}
+              width={120}
+              height={40}
+              className="h-6 w-auto object-contain"
+            />
+          </li>
+        ))}
       </ul>
 
       {note && <p className="mt-3 text-xs text-mist">{note}</p>}

@@ -91,16 +91,11 @@ export const siteConfig = {
     note: "Elige tu medio de pago preferido al confirmar la cotización.",
     // `label` sigue siendo la fuente del texto accesible (alt/title) aunque en
     // pantalla se muestre el logo de cada entidad.
-    // `wide: true` marca las piezas que NO son wordmarks anchos sino
-    // ilustraciones casi cuadradas: se muestran más altas para que se lean.
+    // Todos los logos se muestran al mismo tamaño. Al agregar uno nuevo,
+    // recórtalo con proporción apaisada (~2:1) o se verá diminuto.
     methods: [
       { id: "nequi", label: "Nequi", logo: "/pagos/nequi.webp" },
-      {
-        id: "tarjetas",
-        label: "Tarjeta débito y crédito",
-        logo: "/pagos/tarjetas.jpg",
-        wide: true,
-      },
+      { id: "tarjetas", label: "Tarjeta débito y crédito", logo: "/pagos/tarjetas.jpg" },
       { id: "daviplata", label: "Daviplata", logo: "/pagos/daviplata.png" },
       { id: "davivienda", label: "Davivienda", logo: "/pagos/davivienda.webp" },
     ],

@@ -24,7 +24,10 @@ const NAV = [
 ];
 
 /** Solo visible para ADMIN: da de alta los ingresos del equipo. */
-const OWNER_NAV = [{ href: "/admin/empleados", label: "Empleados", icon: "☰" }];
+const OWNER_NAV = [
+  { href: "/admin/empleados", label: "Empleados", icon: "☰" },
+  { href: "/admin/configuracion", label: "Configuración", icon: "⚙" },
+];
 
 export default async function PanelLayout({
   children,
