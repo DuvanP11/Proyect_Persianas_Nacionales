@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin", label: "Resumen", icon: "▦" },
   { href: "/admin/cotizaciones", label: "Cotizaciones", icon: "✎" },
   { href: "/admin/pedidos", label: "Pedidos", icon: "◎" },
+  { href: "/admin/facturas", label: "Facturación", icon: "§" },
   { href: "/admin/productos", label: "Productos", icon: "◫" },
   { href: "/admin/categorias", label: "Categorías", icon: "▤" },
   { href: "/admin/resenas", label: "Reseñas", icon: "★" },

@@ -7,6 +7,7 @@ import { ShoppingCart, Trash2, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { useCart } from "./CartContext";
 import { cartToWhatsAppMessage, formatMeters } from "@/lib/cart";
+import { CHAIN_SIDE_LABEL } from "@/lib/chain-side";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
@@ -165,6 +166,15 @@ export function CartMenu({ className }: { className?: string }) {
                               {" "}
                               · Motorizada:{" "}
                               <span className="text-cloud">{it.motorized ? "Sí" : "No"}</span>
+                            </>
+                          )}
+                          {it.chainSide != null && (
+                            <>
+                              {" "}
+                              · Mando:{" "}
+                              <span className="text-cloud">
+                                {CHAIN_SIDE_LABEL[it.chainSide]}
+                              </span>
                             </>
                           )}
                         </p>

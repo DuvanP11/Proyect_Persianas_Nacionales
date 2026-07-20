@@ -19,17 +19,27 @@ export const siteConfig = {
     number: "573125526742",
     display: "312 552 6742",
   },
-  email: "contacto@cortinerianacional.com", // Ajustar cuando exista el correo oficial
+  email: "cortinerianacional@gmail.com",
 
   // Ubicación
   address: {
-    street: "Carrera 61D #52-20 Sur",
-    neighborhood: "Barrio Nuevo Muzú",
-    city: "Bogotá D.C.",
+    street: "Cra. 42A #12-02",
+    // Sin barrio en la dirección oficial actual. Se deja vacío (en vez de
+    // borrar la clave) para no romper los componentes que ya la leen; todos
+    // la imprimen condicionada con `&&`.
+    neighborhood: "",
+    city: "Bogotá",
     country: "Colombia",
-    // Coordenadas aproximadas de Nuevo Muzú para el mapa (ajustar si se requiere)
-    mapQuery: "Carrera 61D 52-20 Sur, Nuevo Muzú, Bogotá",
+    mapQuery: "Cra. 42A #12-02, Bogotá",
   },
+
+  /**
+   * Logotipo oficial (fondo blanco). Se usa en documentos impresos —facturas,
+   * remisiones y su vista previa/PDF—, donde el fondo siempre es blanco.
+   * La marca de la interfaz sigue siendo el SVG de `components/layout/Logo`,
+   * que se adapta a los temas claro y oscuro.
+   */
+  logo: "/logo.png",
 
   schedule: "Lunes a Sábado, 9:00 a.m. a 6:00 p.m.",
 
@@ -66,3 +76,19 @@ export const siteConfig = {
 } as const;
 
 export type SiteConfig = typeof siteConfig;
+
+/**
+ * Partes de la dirección que sí tienen contenido, en orden de lectura.
+ * Existe para que footer, facturas y textos legales impriman la misma
+ * dirección sin repetir la lógica ni dejar separadores sueltos (" · , ")
+ * cuando alguna parte —hoy el barrio— está vacía.
+ */
+export function addressParts(): string[] {
+  const { street, neighborhood, city } = siteConfig.address;
+  return [street, neighborhood, city].filter((p) => p.trim().length > 0);
+}
+
+/** Dirección en una sola línea, p. ej. "Cra. 42A #12-02 · Bogotá". */
+export function addressLine(separator = " · "): string {
+  return addressParts().join(separator);
+}

@@ -6,6 +6,12 @@ import { Check, Minus, MoveHorizontal, MoveVertical, Plus, ShoppingBag, Zap } fr
 import { MeasureGuideButton } from "@/components/catalog/MeasureGuideButton";
 import { useCart } from "@/components/cart/CartContext";
 import {
+  CHAIN_SIDES,
+  CHAIN_SIDE_LABEL,
+  DEFAULT_CHAIN_SIDE,
+  type ChainSide,
+} from "@/lib/chain-side";
+import {
   colorOptionsFor,
   defaultFabricFor,
   designOptionsFor,
@@ -53,6 +59,9 @@ export function ProductConfigurator({
   // Solo aplica a enrollables y verticales; en el resto no se pregunta.
   const motorizable = esMotorizable(product.slug);
   const [motorized, setMotorized] = useState(false);
+  // La posición del mando la habilita el administrador producto por producto.
+  const permiteCadenilla = product.permiteCadenilla === true;
+  const [chainSide, setChainSide] = useState<ChainSide>(DEFAULT_CHAIN_SIDE);
 
   const color = colors[colorIdx] ?? colors[0];
 
@@ -88,6 +97,7 @@ export function ProductConfigurator({
       widthM: widthNum,
       heightM: heightNum,
       motorized: motorizable ? motorized : undefined,
+      chainSide: permiteCadenilla ? chainSide : undefined,
     });
 
     setAdded(true);
@@ -214,6 +224,40 @@ export function ProductConfigurator({
             </div>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-mist-2">{MOTORIZACION_NOTA}</p>
+        </div>
+      )}
+
+      {/* Posición del mando — solo si el administrador la habilitó en el producto */}
+      {permiteCadenilla && (
+        <div className="mt-4 rounded-xl border border-line bg-white/[0.03] p-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="inline-flex items-center gap-2 text-sm text-cloud">
+              <MoveHorizontal className="h-4 w-4 text-morado-light" />
+              Posición del mando
+            </span>
+            <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Posición del mando">
+              {CHAIN_SIDES.map((side) => (
+                <button
+                  key={side}
+                  type="button"
+                  role="radio"
+                  aria-checked={chainSide === side}
+                  onClick={() => setChainSide(side)}
+                  className={cn(
+                    "rounded-full border px-3.5 py-1.5 text-sm transition-colors",
+                    chainSide === side
+                      ? "border-morado bg-morado/20 font-medium text-cloud"
+                      : "border-line text-mist hover:border-morado/50 hover:text-cloud",
+                  )}
+                >
+                  {CHAIN_SIDE_LABEL[side]}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-mist-2">
+            Lado desde el que se acciona la cortina, mirando la ventana de frente.
+          </p>
         </div>
       )}
 

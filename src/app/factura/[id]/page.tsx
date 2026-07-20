@@ -1,13 +1,17 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { InvoiceActions } from "@/components/invoice/InvoiceActions";
 import { InvoiceDocument } from "@/components/invoice/InvoiceDocument";
-import { PrintButton } from "@/app/admin/facturas/[id]/PrintButton";
+import { getInvoice } from "@/lib/invoice-data";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Vista pública de la remisión, accesible por su id (enlace que el admin comparte
- * con el cliente por WhatsApp o correo). El id es un cuid difícil de adivinar.
+ * Vista pública de la factura, accesible por su id (el enlace que el panel le
+ * comparte al cliente por WhatsApp o correo). El id es un cuid difícil de
+ * adivinar.
+ *
+ * El cliente puede imprimirla, guardarla como PDF y descargar el XML; no ve el
+ * botón de "enviar por correo", que es una acción del personal.
  */
 export default async function FacturaPublicaPage({
   params,
@@ -15,18 +19,13 @@ export default async function FacturaPublicaPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const invoice = await prisma.invoice.findUnique({
-    where: { id },
-    include: {
-      order: { include: { customer: true, quote: true } },
-    },
-  });
+  const invoice = await getInvoice(id);
   if (!invoice) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-6 pt-28 pb-16 print:pt-6">
-      <div className="mb-6 flex justify-end print:hidden">
-        <PrintButton />
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-28 sm:px-6 print:pt-6">
+      <div className="mb-6 flex justify-end">
+        <InvoiceActions invoiceId={invoice.id} xmlUrl={`/api/facturas/${invoice.id}/xml`} />
       </div>
       <InvoiceDocument invoice={invoice} />
     </div>

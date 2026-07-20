@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "motion/react";
 import { Loader2, CheckCircle2, Tag, Calculator } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { CHAIN_SIDES, CHAIN_SIDE_LABEL } from "@/lib/chain-side";
 import { quoteSchema, type QuoteInput } from "@/lib/schemas";
 import type { Product } from "@/lib/products";
 import { formatCOP } from "@/lib/utils";
@@ -23,7 +24,7 @@ export function QuoteForm({
   products,
 }: {
   initialProduct?: string;
-  products: Pick<Product, "slug" | "name" | "pricePerMeter">[];
+  products: Pick<Product, "slug" | "name" | "pricePerMeter" | "permiteCadenilla">[];
 }) {
   const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -78,6 +79,7 @@ export function QuoteForm({
 
   // Estimación de precio (referencial)
   const selected = products.find((p) => p.name === productoName);
+  const permiteCadenilla = selected?.permiteCadenilla === true;
   const base =
     selected?.pricePerMeter && metros && cantidad
       ? selected.pricePerMeter * Number(metros) * Number(cantidad)
@@ -88,11 +90,20 @@ export function QuoteForm({
   const onSubmit = async (data: QuoteInput) => {
     setServerError(null);
     try {
+      // El selector del mando desaparece al cambiar a un producto que no lo
+      // admite, pero react-hook-form conserva el valor anterior. Se descarta
+      // aquí para no mandar una posición que el cliente no eligió para ESTE
+      // producto.
+      const payload: QuoteInput = {
+        ...data,
+        posicionMando: permiteCadenilla ? data.posicionMando : undefined,
+      };
+
       // 1) Persistir + notificar (la API degrada elegantemente si no hay BD/correo aún)
       const res = await fetch("/api/cotizaciones", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -111,6 +122,7 @@ export function QuoteForm({
           producto: data.producto,
           cantidad: Number(data.cantidad),
           metros: data.metros ? Number(data.metros) : undefined,
+          posicionMando: payload.posicionMando,
           comentarios: data.comentarios,
           codigoPromo: data.tieneVolante ? data.codigoPromo : undefined,
           descuentoPct: data.tieneVolante ? Number(data.descuentoPct) : undefined,
@@ -217,6 +229,23 @@ export function QuoteForm({
             />
           </div>
         </div>
+        {/* Posición del mando: solo en los productos donde el administrador
+            habilitó la opción. En los demás ni siquiera se pregunta. */}
+        {permiteCadenilla && (
+          <div>
+            <label className={labelClass}>Posición del mando</label>
+            <select className={inputClass} {...register("posicionMando")}>
+              {CHAIN_SIDES.map((side) => (
+                <option key={side} value={side}>
+                  {CHAIN_SIDE_LABEL[side]}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-mist-2">
+              Lado desde el que se acciona la cortina.
+            </p>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <label className={labelClass}>Comentarios</label>
           <textarea

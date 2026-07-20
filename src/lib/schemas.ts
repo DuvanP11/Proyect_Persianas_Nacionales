@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CHAIN_SIDES } from "@/lib/chain-side";
 
 /**
  * Esquema de una cotización — usado por el formulario (cliente) y la API (servidor).
@@ -18,6 +19,9 @@ export const quoteSchema = z.object({
   producto: z.string().min(1, "Selecciona un producto"),
   cantidad: z.number({ message: "Cantidad inválida" }).int().min(1, "Mínimo 1"),
   metros: z.number().min(0).optional(),
+  // Posición del mando. Solo se envía si el producto tiene la opción habilitada
+  // (ver `lib/chain-side`); en el resto llega vacía y se guarda como null.
+  posicionMando: z.enum(CHAIN_SIDES).optional(),
   comentarios: z.string().max(1000).optional(),
   // Módulo de descuento
   tieneVolante: z.boolean().optional(),

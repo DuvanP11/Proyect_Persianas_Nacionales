@@ -10,6 +10,7 @@
  * `components/cart/CartContext.tsx`.
  */
 
+import { CHAIN_SIDE_LABEL, type ChainSide } from "@/lib/chain-side";
 import type { ProductColor } from "@/lib/products";
 import { siteConfig } from "@/lib/site-config";
 
@@ -34,6 +35,11 @@ export interface CartItem {
    * (panel japonés, hanas, tradicionales), donde ni siquiera se pregunta.
    */
   motorized?: boolean;
+  /**
+   * Lado en que queda la cadenilla (el mando). `undefined` en los productos
+   * donde el administrador no habilitó la opción, igual que `motorized`.
+   */
+  chainSide?: ChainSide;
 }
 
 /**
@@ -133,6 +139,10 @@ export function cartToWhatsAppMessage(items: CartItem[]): string {
     // sobraría y solo haría ruido en el mensaje.
     if (it.motorized != null) {
       lines.push(`   - Motorizada: ${it.motorized ? "Sí" : "No"}`);
+    }
+    // Igual que la motorización: solo se menciona donde sí se preguntó.
+    if (it.chainSide != null) {
+      lines.push(`   - Mando: ${CHAIN_SIDE_LABEL[it.chainSide]}`);
     }
     lines.push("");
   });

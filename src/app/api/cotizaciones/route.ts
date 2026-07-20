@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { toChainSide } from "@/lib/chain-side";
 import { quoteSchema } from "@/lib/schemas";
 import { notifyQuote } from "@/lib/mailer";
 import { generateOrderCode } from "@/lib/orders";
@@ -47,6 +48,7 @@ async function persistQuote(data: unknown, code: string): Promise<boolean> {
         productName: String(q.producto),
         quantity: Number(q.cantidad),
         meters: q.metros != null ? Number(q.metros) : null,
+        chainSide: toChainSide(q.posicionMando),
         comments: q.comentarios ? String(q.comentarios) : null,
         promoCode: q.tieneVolante ? (q.codigoPromo as string) ?? null : null,
         discountPct: q.tieneVolante && q.descuentoPct != null ? Number(q.descuentoPct) : null,

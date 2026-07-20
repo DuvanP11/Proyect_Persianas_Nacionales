@@ -1,3 +1,4 @@
+import { chainSideLabel } from "./chain-side";
 import { siteConfig } from "./site-config";
 import type { QuoteInput } from "./schemas";
 
@@ -57,6 +58,7 @@ function quoteRows(q: QuoteInput): string {
       ${row("Producto", q.producto)}
       ${row("Cantidad", q.cantidad)}
       ${row("Metros aprox.", q.metros)}
+      ${row("Mando", chainSideLabel(q.posicionMando))}
       ${row("Código promo", q.tieneVolante ? q.codigoPromo : "")}
       ${row("Descuento", q.tieneVolante && q.descuentoPct ? `${q.descuentoPct}%` : "")}
       ${row("Comentarios", q.comentarios)}

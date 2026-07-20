@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { chainSideLabel } from "@/lib/chain-side";
 import { prisma } from "@/lib/prisma";
 import { updateQuoteStatus, convertToOrder } from "./actions";
 
@@ -68,6 +69,9 @@ export default async function CotizacionesPage() {
                       Cant: {q.quantity}
                       {q.meters != null ? ` · ${q.meters} m` : ""}
                       {q.discountPct ? ` · -${q.discountPct}%` : ""}
+                      {chainSideLabel(q.chainSide)
+                        ? ` · ${chainSideLabel(q.chainSide)}`
+                        : ""}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-mist">{q.city}</td>

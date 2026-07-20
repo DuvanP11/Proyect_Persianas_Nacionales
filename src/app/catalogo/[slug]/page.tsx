@@ -101,6 +101,13 @@ export default async function ProductPage({
                 <dt className="text-mist-2">Diseño</dt>
                 <dd className="mt-1 text-cloud">{product.diseno}</dd>
               </div>
+              {/* Solo se muestra en los productos que tienen referencia cargada. */}
+              {product.referenciaDiseno && (
+                <div className="col-span-2">
+                  <dt className="text-mist-2">Referencia del diseño</dt>
+                  <dd className="mt-1 text-cloud">{product.referenciaDiseno}</dd>
+                </div>
+              )}
             </dl>
 
             {/* Colores */}

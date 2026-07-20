@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { nextNumber } from "@/lib/invoice";
 import { ORDER_STATUSES, type OrderStatus } from "@/lib/order-status";
 import { notifyOrderStatus } from "@/lib/order-notify";
 
@@ -61,11 +62,25 @@ export async function generateInvoice(formData: FormData): Promise<void> {
   const amount = Math.max(0, Math.round(Number(formData.get("amount") ?? 0) || 0));
   if (!orderId) return;
 
-  const count = await prisma.invoice.count();
-  const number = `REM-${String(count + 1).padStart(5, "0")}`;
+  // Consecutivo por prefijo: contar filas rompía la numeración desde que
+  // conviven remisiones (REM-) y facturas del módulo de facturación (FAC-).
+  const existing = await prisma.invoice.findMany({ select: { number: true } });
+  const number = nextNumber("REM", existing.map((i) => i.number));
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { customerId: true },
+  });
 
   const invoice = await prisma.invoice.create({
-    data: { number, orderId, amount },
+    // `amount` es el total; sin líneas ni impuestos, el subtotal coincide.
+    data: {
+      number,
+      orderId,
+      customerId: order?.customerId ?? null,
+      subtotal: amount,
+      amount,
+    },
   });
 
   // Si el pedido no tenía total, se guarda el de la remisión.

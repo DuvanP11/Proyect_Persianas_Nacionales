@@ -24,6 +24,13 @@ export interface Product {
   tela: string;
   material: string;
   diseno: string;
+  /** Referencia comercial del diseño ("Milan 502"). Vacío si no se definió. */
+  referenciaDiseno?: string;
+  /**
+   * Si el cliente puede elegir la posición de la cadenilla al comprar.
+   * Se administra por producto desde el panel; `false`/ausente = no se pregunta.
+   */
+  permiteCadenilla?: boolean;
   colors: ProductColor[];
   /** Precio por metro (opcional). `null` => "Cotiza tu medida". */
   pricePerMeter: number | null;

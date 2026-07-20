@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
+import { chainSideLabel } from "@/lib/chain-side";
 import { prisma } from "@/lib/prisma";
 import { updateOrderStatus, generateInvoice } from "../actions";
 import { ORDER_STATUSES, ORDER_META } from "@/lib/order-status";
@@ -102,6 +103,11 @@ export default async function PedidoDetallePage({
                 {order.quote.code} · Cant: {order.quote.quantity}
                 {order.quote.meters != null ? ` · ${order.quote.meters} m` : ""}
               </p>
+              {chainSideLabel(order.quote.chainSide) && (
+                <p className="mt-1 text-xs text-mist">
+                  Mando: {chainSideLabel(order.quote.chainSide)}
+                </p>
+              )}
               {order.quote.address && (
                 <p className="mt-2 text-xs text-mist">Dirección: {order.quote.address}</p>
               )}

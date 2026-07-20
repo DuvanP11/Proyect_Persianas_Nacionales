@@ -27,6 +27,8 @@ type DbProductWithMedia = {
   fabric: string | null;
   material: string | null;
   design: string | null;
+  designRef: string | null;
+  allowChainSide: boolean;
   colors: unknown;
   pricePerMeter: number | null;
   productionTime: string | null;
@@ -48,6 +50,8 @@ function mapDbProduct(p: DbProductWithMedia): Product {
     tela: p.fabric ?? "",
     material: p.material ?? "",
     diseno: p.design ?? "",
+    referenciaDiseno: p.designRef ?? "",
+    permiteCadenilla: p.allowChainSide,
     colors: Array.isArray(p.colors) ? (p.colors as ProductColor[]) : [],
     pricePerMeter: p.pricePerMeter ?? null,
     productionTime: p.productionTime ?? "",

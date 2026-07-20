@@ -24,7 +24,7 @@ function InstagramIcon({ className }: { className?: string }) {
 }
 import { Logo } from "./Logo";
 import { PaymentMethods } from "@/components/ui/PaymentMethods";
-import { siteConfig } from "@/lib/site-config";
+import { addressParts, siteConfig } from "@/lib/site-config";
 import { buildWhatsAppUrl, quickQuoteMessage } from "@/lib/whatsapp";
 
 // Ojo: son enlaces escritos a mano. Si se quita una línea del catálogo, hay que
@@ -128,11 +128,12 @@ export function Footer() {
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-morado-light" />
                 <span>
-                  {siteConfig.address.street}
-                  <br />
-                  {siteConfig.address.neighborhood}
-                  <br />
-                  {siteConfig.address.city}, {siteConfig.address.country}
+                  {addressParts().map((part) => (
+                    <span key={part} className="block">
+                      {part}
+                    </span>
+                  ))}
+                  <span className="block">{siteConfig.address.country}</span>
                 </span>
               </li>
               <li className="flex gap-3">

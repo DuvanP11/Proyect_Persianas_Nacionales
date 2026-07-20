@@ -14,6 +14,10 @@ import { cartCount, type CartItem } from "@/lib/cart";
 // v2: las líneas pasaron de un único `meters` a `widthM` + `heightM`.
 // v3: se agregó `motorized`. Cambiar la clave descarta los carritos viejos en
 // vez de mostrarlos con campos vacíos o medidas inventadas.
+//
+// `chainSide` NO subió la versión: es opcional y las líneas viejas simplemente
+// no lo traen, igual que un producto sin la opción habilitada. Botar el carrito
+// del cliente por un campo que sabe faltar sería peor que dejarlo pasar.
 const STORAGE_KEY = "cn_cart_v3";
 
 interface CartContextValue {

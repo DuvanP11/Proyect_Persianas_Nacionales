@@ -1,3 +1,4 @@
+import { CHAIN_SIDE_LABEL, type ChainSide } from "./chain-side";
 import { siteConfig } from "./site-config";
 
 /**
@@ -31,6 +32,8 @@ export interface QuotePayload {
   producto: string;
   cantidad: number;
   metros?: number;
+  /** Posición del mando, solo si el producto la ofrece. */
+  posicionMando?: ChainSide;
   comentarios?: string;
   codigoPromo?: string;
   descuentoPct?: number;
@@ -55,6 +58,7 @@ export function quoteToWhatsAppMessage(q: QuotePayload): string {
     `*Producto:* ${q.producto}`,
     `*Cantidad:* ${q.cantidad}`,
     q.metros ? `*Metros aprox.:* ${q.metros} m` : null,
+    q.posicionMando ? `*Mando:* ${CHAIN_SIDE_LABEL[q.posicionMando]}` : null,
     q.codigoPromo
       ? `*Volante promocional:* ${q.codigoPromo} (${q.descuentoPct ?? 0}% dcto.)`
       : null,

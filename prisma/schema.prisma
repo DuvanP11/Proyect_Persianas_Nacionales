@@ -61,7 +61,9 @@ model Notification {
   type      NotificationType @default(COTIZACION)
   title     String
   body      String?
-  /** Ruta del panel a la que lleva la notificación (p. ej. /admin/cotizaciones). */
+  /**
+   * Ruta del panel a la que lleva la notificación (p. ej. /admin/cotizaciones).
+   */
   href      String?
   readAt    DateTime?
   createdAt DateTime         @default(now())
@@ -94,8 +96,9 @@ model Customer {
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
-  quotes Quote[]
-  orders Order[]
+  quotes   Quote[]
+  orders   Order[]
+  invoices Invoice[]
 
   @@index([email])
   @@index([type])
@@ -117,27 +120,37 @@ model Category {
 }
 
 model Product {
-  id             String   @id @default(cuid())
-  slug           String   @unique
+  id             String    @id @default(cuid())
+  slug           String    @unique
   name           String
   shortDesc      String?
   description    String?
-  fabric         String? // tipo de tela
+  fabric         String? // tipo de tela (texto libre: Blackout, Screen, Lino, PVC…)
   material       String?
   design         String? // diseño
+  /**
+   * Referencia comercial del diseño, texto libre: "Milan 502", "Roma 302".
+   */
+  designRef      String?
+  /**
+   * Si el cliente puede elegir de qué lado queda la cadenilla (el mando).
+   * Apagado por defecto: los productos existentes siguen comportándose igual y
+   * la opción no aparece en la compra hasta que el administrador la habilite.
+   */
+  allowChainSide Boolean   @default(false)
   colors         Json? // [{ name, hex }]
   pricePerMeter  Int? // en pesos (COP), null => cotiza tu medida
   price          Int?
   productionTime String?
   features       String[]
   gradient       String? // respaldo visual mientras no hay foto
-  stock          Int      @default(0)
-  isActive       Boolean  @default(true)
-  isFeatured     Boolean  @default(false)
+  stock          Int       @default(0)
+  isActive       Boolean   @default(true)
+  isFeatured     Boolean   @default(false)
   categoryId     String?
   category       Category? @relation(fields: [categoryId], references: [id])
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   media ProductMedia[]
 
@@ -182,6 +195,10 @@ model Quote {
   productName String
   quantity    Int         @default(1)
   meters      Float?
+  /**
+   * Posición del mando elegida por el cliente: IZQUIERDA | DERECHA (ver lib/chain-side).
+   */
+  chainSide   String?
   comments    String?
   promoCode   String?
   discountPct Float?
@@ -244,14 +261,98 @@ model OrderStatusHistory {
 //  Facturación
 // ---------------------------------------------------------------------------
 model Invoice {
-  id        String   @id @default(cuid())
-  number    String   @unique
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  amount    Int
+  id     String @id @default(cuid())
+  number String @unique
+
+  /**
+   * Pedido de origen. Opcional desde el módulo de facturación: una factura
+   * puede armarse directamente sobre el catálogo, sin pedido previo. Las
+   * remisiones generadas desde un pedido siguen llegando con este campo.
+   */
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  /**
+   * Cliente facturado. Las remisiones antiguas lo derivan del pedido.
+   */
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  /**
+   * Totales, en pesos enteros (COP no usa centavos). Se guardan calculados
+   * para que la factura sea un documento inmutable: si mañana cambia el precio
+   * del producto, la factura ya emitida sigue diciendo lo mismo.
+   */
+  subtotal      Int @default(0) // suma de líneas, antes de descuentos e IVA
+  discountTotal Int @default(0)
+  extrasTotal   Int @default(0) // accesorios + instalación + transporte + recargos
+  taxTotal      Int @default(0) // IVA
+  /**
+   * Total a pagar. Se conserva el nombre `amount` por compatibilidad.
+   */
+  amount        Int
+
+  notes     String?
   pdfUrl    String?
   issuedAt  DateTime @default(now())
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  items InvoiceItem[]
+
+  @@index([customerId])
+  @@index([issuedAt])
+}
+
+/**
+ * Línea de una factura. Guarda una FOTO del producto en el momento de emitir
+ * (nombre, referencia, tela) en vez de depender de la relación: si el producto
+ * se edita o se borra del catálogo, la factura no cambia ni se rompe.
+ */
+model InvoiceItem {
+  id        String  @id @default(cuid())
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  /**
+   * Referencia al catálogo, sin borrado en cascada (puede quedar en null).
+   */
+  productId String?
+
+  name      String
+  designRef String?
+  fabric    String?
+  /**
+   * Posición del mando: IZQUIERDA | DERECHA | null si no aplica.
+   */
+  chainSide String?
+  widthM    Float?
+  heightM   Float?
+
+  quantity  Int @default(1)
+  unitPrice Int @default(0)
+
+  // Extras por producto (valores absolutos en COP, por línea).
+  accessories  Int @default(0)
+  installation Int @default(0)
+  transport    Int @default(0)
+  surcharge    Int @default(0) // recargos
+  discount     Int @default(0) // descuento de la línea
+
+  /**
+   * IVA de la línea, en porcentaje (0 = exenta).
+   */
+  taxRate Float @default(0)
+
+  notes String? // observaciones
+
+  /**
+   * Total de la línea ya calculado (cantidad · precio + extras − descuento + IVA).
+   */
+  lineTotal Int @default(0)
+  sortOrder Int @default(0)
+
+  @@index([invoiceId])
 }
 
 // ---------------------------------------------------------------------------

@@ -123,6 +123,8 @@ export async function saveProduct(
     fabric: String(formData.get("fabric") ?? "").trim() || null,
     material: String(formData.get("material") ?? "").trim() || null,
     design: String(formData.get("design") ?? "").trim() || null,
+    designRef: String(formData.get("designRef") ?? "").trim() || null,
+    allowChainSide: formData.get("allowChainSide") === "on",
     colors: parseColors(String(formData.get("colors") ?? "")),
     pricePerMeter: num(formData.get("pricePerMeter")),
     productionTime: String(formData.get("productionTime") ?? "").trim() || null,

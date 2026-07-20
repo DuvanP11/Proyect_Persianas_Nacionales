@@ -32,6 +32,8 @@ export default async function EditarProductoPage({
     fabric: p.fabric ?? "",
     material: p.material ?? "",
     design: p.design ?? "",
+    designRef: p.designRef ?? "",
+    allowChainSide: p.allowChainSide,
     productionTime: p.productionTime ?? "",
     gradient: p.gradient ?? "",
     pricePerMeter: p.pricePerMeter != null ? String(p.pricePerMeter) : "",

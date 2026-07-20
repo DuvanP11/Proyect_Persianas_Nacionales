@@ -14,6 +14,8 @@ export type ProductFormValues = {
   fabric: string;
   material: string;
   design: string;
+  designRef: string;
+  allowChainSide: boolean;
   productionTime: string;
   gradient: string;
   pricePerMeter: string;
@@ -36,6 +38,8 @@ const EMPTY: ProductFormValues = {
   fabric: "",
   material: "",
   design: "",
+  designRef: "",
+  allowChainSide: false,
   productionTime: "",
   gradient: "from-slate-800 via-slate-700 to-slate-900",
   pricePerMeter: "",
@@ -157,7 +161,13 @@ export function ProductForm({
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className={label}>Tipo de tela</label>
-            <input name="fabric" defaultValue={values.fabric} className={input} />
+            <input
+              name="fabric"
+              defaultValue={values.fabric}
+              className={input}
+              placeholder="Blackout, Screen, Jacquard, Lino, Poliéster, PVC…"
+            />
+            <p className={hint}>Texto libre: escribe cualquier tela.</p>
           </div>
           <div>
             <label className={label}>Material</label>
@@ -166,6 +176,18 @@ export function ProductForm({
           <div>
             <label className={label}>Diseño</label>
             <input name="design" defaultValue={values.design} className={input} />
+          </div>
+          <div>
+            <label className={label}>Referencia del diseño</label>
+            <input
+              name="designRef"
+              defaultValue={values.designRef}
+              className={input}
+              placeholder="Milan 502, Roma 302, Persiana 2026…"
+            />
+            <p className={hint}>
+              Texto libre. Aparece en la ficha técnica y en las facturas.
+            </p>
           </div>
           <div>
             <label className={label}>Tiempo de producción</label>
@@ -181,6 +203,32 @@ export function ProductForm({
             <p className={hint}>Clases Tailwind que sirven de fondo mientras no hay foto.</p>
           </div>
         </div>
+      </div>
+
+      {/* Opciones que ve el cliente al comprar */}
+      <div className="rounded-2xl border border-line bg-surface/60 p-5">
+        <h2 className="mb-4 font-display text-lg text-cloud">Opciones de compra</h2>
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            name="allowChainSide"
+            defaultChecked={values.allowChainSide}
+            className="peer sr-only"
+          />
+          {/* Switch: mismo patrón visual que el resto del sitio (ver QuoteForm). */}
+          <span className="relative mt-0.5 h-6 w-11 shrink-0 rounded-full bg-line transition-colors peer-checked:bg-morado peer-focus-visible:ring-2 peer-focus-visible:ring-morado/50">
+            <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-5" />
+          </span>
+          <span>
+            <span className="block text-sm font-medium text-cloud">
+              Permitir seleccionar posición del mando
+            </span>
+            <span className={hint}>
+              Activado, el cliente elige entre cadenilla izquierda o derecha al agregar
+              el producto. Desactivado, la opción no se muestra.
+            </span>
+          </span>
+        </label>
       </div>
 
       {/* Listas */}

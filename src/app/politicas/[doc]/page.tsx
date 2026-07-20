@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { siteConfig } from "@/lib/site-config";
+import { addressLine, siteConfig } from "@/lib/site-config";
 
 /**
  * Páginas legales. El contenido es un marcador de posición profesional listo
@@ -60,8 +60,8 @@ export default async function LegalPage({
           <section>
             <h2 className="font-display text-lg font-semibold text-cloud">1. Responsable</h2>
             <p className="mt-2">
-              {siteConfig.name}, ubicada en {siteConfig.address.street}, {siteConfig.address.neighborhood},{" "}
-              {siteConfig.address.city}. Contacto: {siteConfig.whatsapp.display} · {siteConfig.email}.
+              {siteConfig.name}, ubicada en {addressLine(", ")}. Contacto:{" "}
+              {siteConfig.whatsapp.display} · {siteConfig.email}.
             </p>
           </section>
           <section>
