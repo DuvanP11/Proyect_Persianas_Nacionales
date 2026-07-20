@@ -294,6 +294,20 @@ model Invoice {
 
   notes     String?
   pdfUrl    String?
+
+  /**
+   * Firma del cliente como data URI (`data:image/png;base64,…`).
+   *
+   * Se guarda EN LA BASE y no como archivo porque el disco de Vercel es de
+   * solo lectura: un archivo en /public/uploads no sobrevive al despliegue.
+   * Una firma pesa entre 5 y 30 KB, así que la columna es un sitio razonable
+   * y además la vuelve parte inseparable del documento.
+   */
+  signature   String?
+  /** Nombre de quien firma (puede no ser el titular de la factura). */
+  signerName  String?
+  signedAt    DateTime?
+
   issuedAt  DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

@@ -79,9 +79,11 @@ export async function notifyOrderStatus(
       subject: `Tu pedido ${o.code} está: ${meta.text} — ${siteConfig.name}`,
       html,
     })
-      .then(() => Boolean(process.env.RESEND_API_KEY))
+      // Si `sendEmail` resuelve es porque el proveedor lo aceptó; ya no hace
+      // falta mirar la variable de entorno (antes era un no-op silencioso).
+      .then(() => true)
       .catch((e) => {
-        console.error("[order-notify] email:", e);
+        console.error("[order-notify] email:", e instanceof Error ? e.message : e);
         return false;
       }),
     sendWhatsAppText(o.phone, waBody),

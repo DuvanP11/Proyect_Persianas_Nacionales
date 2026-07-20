@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth";
 import { getInvoice } from "@/lib/invoice-data";
-import { invoiceToXml } from "@/lib/invoice";
+import { invoiceToUbl } from "@/lib/invoice-ubl";
 
 /**
  * GET /api/facturas/<id>/xml — descarga la factura en XML.
@@ -24,7 +24,7 @@ export async function GET(
   // adelante se decide restringir la descarga solo al personal.
   await getSession();
 
-  return new Response(invoiceToXml(invoice), {
+  return new Response(invoiceToUbl(invoice), {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
       "Content-Disposition": `attachment; filename="${invoice.number}.xml"`,

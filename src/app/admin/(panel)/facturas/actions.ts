@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { toChainSide } from "@/lib/chain-side";
-import { sendEmail } from "@/lib/mailer";
+import { EmailError, sendEmail } from "@/lib/mailer";
 import { prisma } from "@/lib/prisma";
 import { siteUrl } from "@/lib/site-url";
 import { getInvoice } from "@/lib/invoice-data";
@@ -224,6 +224,68 @@ export async function deleteInvoice(formData: FormData): Promise<void> {
   revalidateInvoices();
 }
 
+export type SignatureState = { ok?: boolean; error?: string };
+
+/** Tope de tamaño de la firma. Una firma real ronda los 10–30 KB. */
+const MAX_SIGNATURE_BYTES = 400 * 1024;
+
+/**
+ * Guarda la firma del cliente en la factura.
+ *
+ * La firma llega como data URI desde el navegador (lienzo o imagen subida).
+ * Se valida el formato y el tamaño ANTES de tocar la base: el campo es texto
+ * libre y sin control cabría cualquier cosa, incluido un payload enorme.
+ */
+export async function saveInvoiceSignature(
+  _prev: SignatureState,
+  formData: FormData,
+): Promise<SignatureState> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "").trim();
+  const signature = String(formData.get("signature") ?? "").trim();
+  const signerName = String(formData.get("signerName") ?? "").trim() || null;
+
+  if (!id) return { error: "Factura no válida." };
+  if (!signature) return { error: "No hay ninguna firma que guardar." };
+
+  // Solo se aceptan imágenes en base64; nada de URLs remotas ni SVG (que
+  // podría traer scripts dentro).
+  if (!/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(signature)) {
+    return { error: "El formato de la firma no es válido. Usa PNG o JPG." };
+  }
+
+  // La longitud en base64 sobreestima ~33% el tamaño real; sirve de tope.
+  if (signature.length > MAX_SIGNATURE_BYTES) {
+    return { error: "La firma pesa demasiado. Usa una imagen más liviana." };
+  }
+
+  try {
+    await prisma.invoice.update({
+      where: { id },
+      data: { signature, signerName, signedAt: new Date() },
+    });
+  } catch (e) {
+    console.error("[facturas] error guardando la firma:", e);
+    return { error: "No se pudo guardar la firma. Intenta de nuevo." };
+  }
+
+  revalidateInvoices(id);
+  return { ok: true };
+}
+
+/** Borra la firma para poder volver a capturarla. */
+export async function removeInvoiceSignature(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) return;
+  await prisma.invoice.update({
+    where: { id },
+    data: { signature: null, signerName: null, signedAt: null },
+  });
+  revalidateInvoices(id);
+}
+
 /** Envía la factura al correo del cliente. */
 export async function sendInvoiceEmail(
   _prev: SendEmailState,
@@ -246,9 +308,18 @@ export async function sendInvoiceEmail(
       subject: `Factura ${invoice.number} — ${siteConfig.name}`,
       html: invoiceToEmailHtml(invoice, url),
     });
+    console.info(`[facturas] ${invoice.number} enviada a ${invoice.customer.email}`);
     return { ok: true };
   } catch (e) {
-    console.error("[facturas] error enviando el correo:", e);
-    return { error: "No se pudo enviar el correo. Revisa la configuración de RESEND_API_KEY." };
+    // Se propaga el motivo REAL: "no se pudo enviar" a secas obliga a entrar
+    // a los logs del servidor para saber si falta la clave, si el dominio no
+    // está verificado o si el correo del cliente está mal escrito.
+    if (e instanceof EmailError) {
+      console.error(`[facturas] envío fallido (${e.stage}):`, e.message, e.detail ?? "");
+      return { error: e.message };
+    }
+    const detail = e instanceof Error ? e.message : String(e);
+    console.error("[facturas] error inesperado enviando el correo:", detail);
+    return { error: `Error inesperado al enviar: ${detail}` };
   }
 }

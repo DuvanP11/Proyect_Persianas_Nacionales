@@ -1,7 +1,12 @@
 import { notFound } from "next/navigation";
-import { sendInvoiceEmail } from "@/app/admin/(panel)/facturas/actions";
+import {
+  removeInvoiceSignature,
+  saveInvoiceSignature,
+  sendInvoiceEmail,
+} from "@/app/admin/(panel)/facturas/actions";
 import { InvoiceActions } from "@/components/invoice/InvoiceActions";
 import { InvoiceDocument } from "@/components/invoice/InvoiceDocument";
+import { SignatureSection } from "@/components/invoice/SignatureSection";
 import { requireAdmin } from "@/lib/auth";
 import { invoiceToWhatsAppMessage } from "@/lib/invoice";
 import { getInvoice } from "@/lib/invoice-data";
@@ -58,6 +63,19 @@ export default async function FacturaPage({
       </div>
 
       <InvoiceDocument invoice={invoice} />
+
+      {/* Captura de la firma: no se imprime, pero la firma guardada sí sale
+          dentro del documento de arriba. */}
+      <div className="mt-6">
+        <SignatureSection
+          invoiceId={invoice.id}
+          current={invoice.signature ?? null}
+          signerName={invoice.signerName ?? null}
+          signedAt={invoice.signedAt ? invoice.signedAt.toISOString() : null}
+          saveAction={saveInvoiceSignature}
+          removeAction={removeInvoiceSignature}
+        />
+      </div>
     </div>
   );
 }

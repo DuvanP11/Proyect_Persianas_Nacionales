@@ -84,6 +84,9 @@ function toView(row: InvoiceRow): InvoiceView {
     taxTotal: row.taxTotal,
     amount: row.amount,
     notes: row.notes,
+    signature: row.signature,
+    signerName: row.signerName,
+    signedAt: row.signedAt,
     customer: customer
       ? {
           firstName: customer.firstName,

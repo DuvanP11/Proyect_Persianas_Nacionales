@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { toChainSide } from "@/lib/chain-side";
-import { emptyLine, type InvoiceLineInput } from "@/lib/invoice";
+import { emptyLine, nextNumber, type InvoiceLineInput } from "@/lib/invoice";
 import { prisma } from "@/lib/prisma";
 import {
   InvoiceBuilder,
@@ -27,7 +27,7 @@ export default async function NuevaFacturaPage({
 }) {
   const { pedido } = await searchParams;
 
-  const [products, customers] = await Promise.all([
+  const [products, customers, emitidas] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
@@ -49,8 +49,10 @@ export default async function NuevaFacturaPage({
         email: true,
         phone: true,
         city: true,
+        address: true,
       },
     }),
+    prisma.invoice.findMany({ select: { number: true } }),
   ]);
 
   const customerOptions: InvoiceCustomerOption[] = customers.map((c) => ({
@@ -59,7 +61,13 @@ export default async function NuevaFacturaPage({
     email: c.email,
     phone: c.phone,
     city: c.city,
+    address: c.address,
   }));
+
+  // Número y fecha solo para la vista previa: el definitivo se asigna al
+  // guardar (otra factura podría emitirse mientras esta se está armando).
+  const nextNumberPreview = nextNumber("FAC", emitidas.map((i) => i.number));
+  const issuedAtISO = new Date().toISOString();
 
   const order = pedido ? await buildOrderContext(pedido, products) : null;
 
@@ -86,6 +94,8 @@ export default async function NuevaFacturaPage({
         products={products as InvoiceProductOption[]}
         customers={customerOptions}
         order={order}
+        nextNumberPreview={nextNumberPreview}
+        issuedAtISO={issuedAtISO}
       />
     </div>
   );
@@ -142,6 +152,10 @@ async function buildOrderContext(
     customerName: `${order.customer.firstName} ${order.customer.lastName}`.trim(),
     customerPhone: order.customer.phone,
     customerEmail: order.customer.email,
+    // La dirección de la cotización es la de instalación y manda sobre la
+    // del perfil, igual que en el documento final (ver lib/invoice-data).
+    customerAddress: quote?.address ?? order.customer.address,
+    customerCity: order.customer.city,
     quoteCode: quote?.code ?? null,
     lines: [line],
   };

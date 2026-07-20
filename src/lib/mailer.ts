@@ -21,13 +21,64 @@ interface EmailMessage {
   html: string;
 }
 
-export async function sendEmail(msg: EmailMessage): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
+/**
+ * Error de envío con un mensaje pensado para MOSTRARSE al usuario.
+ *
+ * `stage` indica en qué punto del proceso falló, para que los logs digan
+ * exactamente dónde mirar en vez de un "no se pudo enviar" genérico.
+ */
+export class EmailError extends Error {
+  constructor(
+    message: string,
+    readonly stage: "config" | "destinatario" | "proveedor" | "red",
+    readonly detail?: string,
+  ) {
+    super(message);
+    this.name = "EmailError";
+  }
+}
 
-  // Proveedor: Resend (HTTP API, sin dependencias extra)
-  if (resendKey) {
-    const from = process.env.EMAIL_FROM ?? `Cortinería Nacional <onboarding@resend.dev>`;
-    const res = await fetch("https://api.resend.com/emails", {
+/** `true` si hay un proveedor de correo configurado. */
+export function isEmailConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
+}
+
+/** Validación mínima de dirección, para no gastar una llamada al proveedor. */
+function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+/**
+ * Envía un correo con Resend.
+ *
+ * LANZA `EmailError` ante cualquier problema, incluida la falta de
+ * configuración. Antes esta función era un no-op silencioso cuando no había
+ * `RESEND_API_KEY`: devolvía éxito sin enviar nada, así que la interfaz decía
+ * "enviada" y el correo nunca llegaba. Quien necesite tolerancia a fallos debe
+ * capturar el error explícitamente (lo hace `notifyQuote`, best-effort).
+ */
+export async function sendEmail(msg: EmailMessage): Promise<void> {
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+
+  if (!resendKey) {
+    throw new EmailError(
+      "No hay proveedor de correo configurado: falta la variable RESEND_API_KEY.",
+      "config",
+    );
+  }
+
+  if (!msg.to || !looksLikeEmail(msg.to)) {
+    throw new EmailError(
+      `La dirección de destino no es válida: "${msg.to}".`,
+      "destinatario",
+    );
+  }
+
+  const from = process.env.EMAIL_FROM?.trim() || "Cortinería Nacional <onboarding@resend.dev>";
+
+  let res: Response;
+  try {
+    res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${resendKey}`,
@@ -35,14 +86,33 @@ export async function sendEmail(msg: EmailMessage): Promise<void> {
       },
       body: JSON.stringify({ from, to: msg.to, subject: msg.subject, html: msg.html }),
     });
-    if (!res.ok) throw new Error(`Resend: ${res.status}`);
-    return;
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e);
+    console.error("[mailer] fallo de red hacia Resend:", detail);
+    throw new EmailError("No se pudo contactar al servicio de correo.", "red", detail);
   }
 
-  // Sin proveedor configurado: no-op (log en desarrollo)
-  if (process.env.NODE_ENV === "development") {
-    console.info(`[mailer] (simulado) → ${msg.to}: ${msg.subject}`);
+  if (!res.ok) {
+    // El cuerpo de Resend trae el motivo real (dominio sin verificar, clave
+    // inválida, remitente no autorizado…). Sin él, depurar es adivinar.
+    const body = await res.text().catch(() => "");
+    console.error(`[mailer] Resend respondió ${res.status}:`, body);
+
+    // Los fallos más comunes merecen un mensaje que diga qué hacer.
+    let hint = `El servicio de correo respondió ${res.status}.`;
+    if (res.status === 401 || res.status === 403) {
+      hint = "La clave RESEND_API_KEY es inválida o no tiene permisos.";
+    } else if (res.status === 422) {
+      hint =
+        "Resend rechazó el remitente o el destinatario. Verifica EMAIL_FROM " +
+        "y que el dominio esté verificado en Resend.";
+    } else if (res.status === 429) {
+      hint = "Se superó el límite de envíos del plan de Resend. Intenta más tarde.";
+    }
+    throw new EmailError(hint, "proveedor", body || undefined);
   }
+
+  console.info(`[mailer] enviado → ${msg.to}: ${msg.subject}`);
 }
 
 function quoteRows(q: QuoteInput): string {
@@ -65,19 +135,27 @@ function quoteRows(q: QuoteInput): string {
     </table>`;
 }
 
-/** Notifica al administrador y envía copia al cliente. Nunca lanza (best-effort). */
+/**
+ * Notifica al administrador y envía copia al cliente.
+ *
+ * NUNCA lanza: una cotización no puede perderse porque el correo falle (el
+ * cliente ya siguió a WhatsApp y el registro ya está en la base). Los dos
+ * envíos son independientes a propósito — que rebote el del administrador no
+ * debe dejar al cliente sin su copia.
+ *
+ * `emailed` dice si al menos uno SALIÓ de verdad, no si hay clave configurada.
+ */
 export async function notifyQuote(q: QuoteInput): Promise<{ emailed: boolean }> {
-  try {
-    const adminTo = process.env.ADMIN_EMAIL ?? siteConfig.email;
-    const rows = quoteRows(q);
+  const adminTo = process.env.ADMIN_EMAIL?.trim() || siteConfig.email;
+  const rows = quoteRows(q);
 
-    await sendEmail({
+  const results = await Promise.allSettled([
+    sendEmail({
       to: adminTo,
       subject: `Nueva cotización — ${q.nombre} ${q.apellidos}`,
       html: `<h2 style="font-family:Arial">Nueva cotización</h2>${rows}`,
-    });
-
-    await sendEmail({
+    }),
+    sendEmail({
       to: q.correo,
       subject: `Recibimos tu cotización — ${siteConfig.name}`,
       html: `
@@ -88,11 +166,15 @@ export async function notifyQuote(q: QuoteInput): Promise<{ emailed: boolean }> 
           <p style="margin-top:16px">Recuerda: <strong>la instalación es totalmente gratis</strong>.</p>
           <p style="color:#71717a">${siteConfig.name} · ${siteConfig.slogan}</p>
         </div>`,
-    });
+    }),
+  ]);
 
-    return { emailed: Boolean(process.env.RESEND_API_KEY) };
-  } catch (e) {
-    console.error("[mailer] error:", e);
-    return { emailed: false };
-  }
+  results.forEach((r, i) => {
+    if (r.status === "rejected") {
+      const quien = i === 0 ? "administrador" : "cliente";
+      console.error(`[mailer] no se pudo avisar al ${quien}:`, r.reason?.message ?? r.reason);
+    }
+  });
+
+  return { emailed: results.some((r) => r.status === "fulfilled") };
 }

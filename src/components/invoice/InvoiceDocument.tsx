@@ -169,6 +169,32 @@ export function InvoiceDocument({ invoice }: { invoice: InvoiceView }) {
         </dl>
       </div>
 
+      {/* Firma del cliente. Se imprime junto a la línea de recibido: es la
+          constancia de que el pedido se entregó conforme. */}
+      {invoice.signature && (
+        <section className="mt-8 flex justify-end">
+          <div className="w-64 text-center">
+            {/* `unoptimized`: es un data URI embebido, no hay qué optimizar. */}
+            <Image
+              src={invoice.signature}
+              alt={`Firma de ${invoice.signerName ?? "el cliente"}`}
+              width={320}
+              height={110}
+              unoptimized
+              className="mx-auto h-20 w-auto object-contain"
+            />
+            <p className="mt-1 border-t border-neutral-300 pt-1 text-xs text-neutral-600">
+              {invoice.signerName || customerName(invoice)}
+            </p>
+            <p className="text-[11px] text-neutral-400">
+              Recibido conforme
+              {invoice.signedAt &&
+                ` · ${new Date(invoice.signedAt).toLocaleDateString("es-CO")}`}
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* Observaciones generales */}
       {invoice.notes && (
         <section className="mt-6 rounded-xl bg-neutral-50 p-4 print:bg-transparent print:p-0">

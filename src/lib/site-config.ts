@@ -41,6 +41,35 @@ export const siteConfig = {
    */
   logo: "/logo.png",
 
+  /**
+   * Datos fiscales del emisor — necesarios para la facturación electrónica.
+   *
+   * ⚠️ TODO: los marcados con "PENDIENTE" hay que reemplazarlos por los reales
+   * del RUT antes de presentar nada ante la DIAN. Con valores vacíos el XML se
+   * genera igual (para poder trabajar), pero sale marcado como incompleto.
+   *
+   * Los códigos siguen las tablas de la DIAN:
+   *  · `personType`  1 = jurídica, 2 = natural
+   *  · `taxLevelCode` régimen: "R-99-PN" (no responsable de IVA), "O-13"/"O-15"…
+   *  · `cityCode`/`departmentCode` códigos DANE
+   *  · `environment` 1 = producción, 2 = pruebas (habilitación)
+   */
+  fiscal: {
+    legalName: "PENDIENTE — razón social del RUT",
+    nit: "", // PENDIENTE, sin dígito de verificación
+    dv: "", // PENDIENTE, dígito de verificación
+    personType: "2",
+    taxLevelCode: "R-99-PN",
+    cityCode: "11001",
+    cityName: "Bogotá, D.C.",
+    departmentCode: "11",
+    departmentName: "Bogotá",
+    countryCode: "CO",
+    countryName: "Colombia",
+    postalZone: "",
+    environment: "2",
+  },
+
   schedule: "Lunes a Sábado, 9:00 a.m. a 6:00 p.m.",
 
   // Redes sociales
@@ -62,9 +91,16 @@ export const siteConfig = {
     note: "Elige tu medio de pago preferido al confirmar la cotización.",
     // `label` sigue siendo la fuente del texto accesible (alt/title) aunque en
     // pantalla se muestre el logo de cada entidad.
+    // `wide: true` marca las piezas que NO son wordmarks anchos sino
+    // ilustraciones casi cuadradas: se muestran más altas para que se lean.
     methods: [
       { id: "nequi", label: "Nequi", logo: "/pagos/nequi.webp" },
-      { id: "bold", label: "Bold · Tarjeta débito y crédito", logo: "/pagos/bold.png" },
+      {
+        id: "tarjetas",
+        label: "Tarjeta débito y crédito",
+        logo: "/pagos/tarjetas.jpg",
+        wide: true,
+      },
       { id: "daviplata", label: "Daviplata", logo: "/pagos/daviplata.png" },
       { id: "davivienda", label: "Davivienda", logo: "/pagos/davivienda.webp" },
     ],

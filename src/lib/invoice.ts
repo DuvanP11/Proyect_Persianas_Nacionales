@@ -147,6 +147,10 @@ export interface InvoiceView {
   taxTotal: number;
   amount: number;
   notes: string | null;
+  /** Firma del cliente como data URI, si ya firmó. */
+  signature?: string | null;
+  signerName?: string | null;
+  signedAt?: Date | null;
   customer: {
     firstName: string;
     lastName: string;
@@ -175,6 +179,60 @@ export interface InvoiceView {
     notes: string | null;
     lineTotal: number;
   }[];
+}
+
+/**
+ * Arma una `InvoiceView` a partir de lo que hay en el constructor, SIN guardar.
+ *
+ * Es lo que permite que la vista previa sea idéntica al documento final: no se
+ * dibuja una maqueta parecida, se alimenta el MISMO componente con los mismos
+ * totales calculados por las mismas funciones. Si algo cambia en el cálculo,
+ * cambia en los dos sitios a la vez.
+ *
+ * `issuedAt` llega desde fuera (no se usa `new Date()` aquí) para que servidor
+ * y cliente rendericen lo mismo y no haya discrepancia de hidratación.
+ */
+export function draftInvoiceView(input: {
+  number: string;
+  issuedAt: Date;
+  customer: InvoiceView["customer"];
+  orderCode?: string | null;
+  notes?: string | null;
+  lines: InvoiceLineInput[];
+}): InvoiceView {
+  const totals = computeInvoice(input.lines);
+  return {
+    id: "borrador",
+    number: input.number,
+    issuedAt: input.issuedAt,
+    subtotal: totals.subtotal,
+    discountTotal: totals.discountTotal,
+    extrasTotal: totals.extrasTotal,
+    taxTotal: totals.taxTotal,
+    amount: totals.total,
+    notes: input.notes?.trim() || null,
+    customer: input.customer,
+    order: input.orderCode ? { code: input.orderCode } : null,
+    items: input.lines.map((line, i) => ({
+      id: `borrador-${i}`,
+      name: line.name,
+      designRef: line.designRef ?? null,
+      fabric: line.fabric ?? null,
+      chainSide: line.chainSide ?? null,
+      widthM: line.widthM ?? null,
+      heightM: line.heightM ?? null,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      accessories: line.accessories,
+      installation: line.installation,
+      transport: line.transport,
+      surcharge: line.surcharge,
+      discount: line.discount,
+      taxRate: line.taxRate,
+      notes: line.notes ?? null,
+      lineTotal: computeLine(line).total,
+    })),
+  };
 }
 
 /** Nombre completo del cliente, o un texto neutro si la factura no tiene uno. */
@@ -221,7 +279,7 @@ export function nextNumber(prefix: string, existing: string[]): string {
 }
 
 // ---------------------------------------------------------------------------
-//  Exportaciones: XML, correo y WhatsApp
+//  Exportaciones: correo y WhatsApp (el XML UBL vive en lib/invoice-ubl)
 // ---------------------------------------------------------------------------
 
 /** Escapa los cinco caracteres que no pueden ir crudos en XML. */
@@ -232,82 +290,6 @@ function xmlEscape(value: unknown): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
-}
-
-/**
- * Factura en XML.
- *
- * Estructura propia, pensada como PASO PREVIO a la facturación electrónica:
- * los nombres de los campos siguen de cerca los de UBL 2.1 / DIAN (emisor,
- * receptor, líneas, impuestos, totales) para que migrar a un proveedor
- * autorizado sea mapear etiquetas, no rehacer el modelo. NO es un documento
- * válido ante la DIAN: le faltan CUFE, firma digital y resolución.
- */
-export function invoiceToXml(invoice: InvoiceView): string {
-  const c = invoice.customer;
-  const lines = invoice.items
-    .map((item, i) => {
-      const details = itemDetails(item);
-      return `    <Linea numero="${i + 1}">
-      <Descripcion>${xmlEscape(item.name)}</Descripcion>
-      <ReferenciaDiseno>${xmlEscape(item.designRef ?? "")}</ReferenciaDiseno>
-      <TipoTela>${xmlEscape(item.fabric ?? "")}</TipoTela>
-      <PosicionMando>${xmlEscape(item.chainSide ?? "")}</PosicionMando>
-      <AnchoMetros>${item.widthM ?? ""}</AnchoMetros>
-      <AltoMetros>${item.heightM ?? ""}</AltoMetros>
-      <Cantidad>${item.quantity}</Cantidad>
-      <PrecioUnitario>${item.unitPrice}</PrecioUnitario>
-      <Extras>
-        <Accesorios>${item.accessories}</Accesorios>
-        <Instalacion>${item.installation}</Instalacion>
-        <Transporte>${item.transport}</Transporte>
-        <Recargos>${item.surcharge}</Recargos>
-      </Extras>
-      <Descuento>${item.discount}</Descuento>
-      <PorcentajeIVA>${item.taxRate}</PorcentajeIVA>
-      <Observaciones>${xmlEscape(item.notes ?? "")}</Observaciones>
-      <Detalle>${xmlEscape(details)}</Detalle>
-      <TotalLinea>${item.lineTotal}</TotalLinea>
-    </Linea>`;
-    })
-    .join("\n");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Documento preparatorio para facturación electrónica.
-  Sin CUFE, firma digital ni resolución DIAN: no tiene validez fiscal todavía.
--->
-<Factura>
-  <Numero>${xmlEscape(invoice.number)}</Numero>
-  <FechaEmision>${new Date(invoice.issuedAt).toISOString()}</FechaEmision>
-  <Moneda>COP</Moneda>
-  <Emisor>
-    <Nombre>${xmlEscape(siteConfig.name)}</Nombre>
-    <Direccion>${xmlEscape(addressLine(", "))}</Direccion>
-    <Telefono>${xmlEscape(siteConfig.whatsapp.display)}</Telefono>
-    <Correo>${xmlEscape(siteConfig.email)}</Correo>
-  </Emisor>
-  <Receptor>
-    <Nombre>${xmlEscape(customerName(invoice))}</Nombre>
-    <Correo>${xmlEscape(c?.email ?? "")}</Correo>
-    <Telefono>${xmlEscape(c?.phone ?? "")}</Telefono>
-    <Direccion>${xmlEscape(c?.address ?? "")}</Direccion>
-    <Ciudad>${xmlEscape(c?.city ?? "")}</Ciudad>
-  </Receptor>
-  <PedidoRelacionado>${xmlEscape(invoice.order?.code ?? "")}</PedidoRelacionado>
-  <Lineas>
-${lines}
-  </Lineas>
-  <Totales>
-    <Subtotal>${invoice.subtotal}</Subtotal>
-    <Extras>${invoice.extrasTotal}</Extras>
-    <Descuentos>${invoice.discountTotal}</Descuentos>
-    <IVA>${invoice.taxTotal}</IVA>
-    <Total>${invoice.amount}</Total>
-  </Totales>
-  <Observaciones>${xmlEscape(invoice.notes ?? "")}</Observaciones>
-</Factura>
-`;
 }
 
 /**

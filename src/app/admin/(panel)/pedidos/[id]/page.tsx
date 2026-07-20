@@ -177,7 +177,19 @@ export default async function PedidoDetallePage({
                   return (
                     <li key={inv.id} className="rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm">
                       <div className="flex items-center justify-between gap-3">
-                        <span className="font-mono text-morado-light">{inv.number}</span>
+                        <span className="font-mono text-morado-light">
+                          {inv.number}
+                          {/* Constancia de entrega: se ve de un vistazo cuáles
+                              ya fueron recibidas conformes por el cliente. */}
+                          {inv.signedAt && (
+                            <span
+                              title={`Firmada por ${inv.signerName ?? "el cliente"} el ${new Date(inv.signedAt).toLocaleString("es-CO")}`}
+                              className="ml-2 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-300"
+                            >
+                              Firmada
+                            </span>
+                          )}
+                        </span>
                         <span className="text-cloud">{formatCOP(inv.amount)}</span>
                         <a
                           href={`/admin/facturas/${inv.id}`}

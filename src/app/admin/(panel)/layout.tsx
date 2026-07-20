@@ -12,6 +12,7 @@ import {
 
 const NAV = [
   { href: "/admin", label: "Resumen", icon: "▦" },
+  { href: "/admin/estadisticas", label: "Estadísticas", icon: "◑" },
   { href: "/admin/cotizaciones", label: "Cotizaciones", icon: "✎" },
   { href: "/admin/pedidos", label: "Pedidos", icon: "◎" },
   { href: "/admin/facturas", label: "Facturación", icon: "§" },

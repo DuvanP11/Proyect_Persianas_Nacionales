@@ -2,7 +2,8 @@
 
 import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Trash2, UserPlus, Users } from "lucide-react";
+import { Eye, EyeOff, Plus, Trash2, UserPlus, Users } from "lucide-react";
+import { InvoiceDocument } from "@/components/invoice/InvoiceDocument";
 import {
   CHAIN_SIDES,
   CHAIN_SIDE_LABEL,
@@ -12,8 +13,10 @@ import {
 import {
   computeInvoice,
   computeLine,
+  draftInvoiceView,
   emptyLine,
   type InvoiceLineInput,
+  type InvoiceView,
 } from "@/lib/invoice";
 import { formatCOP } from "@/lib/utils";
 import { createInvoice, type InvoiceFormState } from "./actions";
@@ -36,6 +39,7 @@ export type InvoiceCustomerOption = {
   email: string;
   phone: string;
   city: string | null;
+  address: string | null;
 };
 
 /**
@@ -50,6 +54,8 @@ export type InvoiceOrderContext = {
   customerName: string;
   customerPhone: string;
   customerEmail: string;
+  customerAddress: string | null;
+  customerCity: string | null;
   quoteCode: string | null;
   lines: InvoiceLineInput[];
 };
@@ -76,11 +82,18 @@ export function InvoiceBuilder({
   products,
   customers,
   order = null,
+  nextNumberPreview,
+  issuedAtISO,
 }: {
   products: InvoiceProductOption[];
   customers: InvoiceCustomerOption[];
   /** Si se factura un pedido, su contexto; `null` en una factura suelta. */
   order?: InvoiceOrderContext | null;
+  /** Número que le tocará a esta factura, solo para mostrarlo en la vista previa. */
+  nextNumberPreview: string;
+  /** Fecha de emisión en ISO. Llega del servidor para que no haya desajuste
+   *  de hidratación entre lo que pinta el servidor y lo que pinta el navegador. */
+  issuedAtISO: string;
 }) {
   const [state, formAction, pending] = useActionState<InvoiceFormState, FormData>(
     createInvoice,
@@ -93,6 +106,16 @@ export function InvoiceBuilder({
   const [customerMode, setCustomerMode] = useState<"existing" | "new">("existing");
   const [customerId, setCustomerId] = useState(order?.customerId ?? "");
   const [search, setSearch] = useState("");
+  const [notes, setNotes] = useState("");
+  const [showPreview, setShowPreview] = useState(true);
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    city: "",
+    address: "",
+  });
 
   const totals = useMemo(() => computeInvoice(lines), [lines]);
 
@@ -108,6 +131,60 @@ export function InvoiceBuilder({
   }, [customers, search]);
 
   const selected = customers.find((c) => c.id === customerId) ?? null;
+
+  /**
+   * Cliente tal como saldrá impreso, según de dónde vengan los datos.
+   * `null` = venta a consumidor final (el documento lo rotula así).
+   */
+  const previewCustomer = useMemo<InvoiceView["customer"]>(() => {
+    if (order) {
+      return {
+        firstName: order.customerName,
+        lastName: "",
+        email: order.customerEmail,
+        phone: order.customerPhone,
+        address: order.customerAddress,
+        city: order.customerCity,
+      };
+    }
+    if (customerMode === "new") {
+      const { firstName, lastName, phone, email, city, address } = newCustomer;
+      // Sin al menos un nombre no hay nada que mostrar todavía.
+      if (!firstName.trim()) return null;
+      return {
+        firstName,
+        lastName,
+        email,
+        phone,
+        address: address || null,
+        city: city || null,
+      };
+    }
+    if (!selected) return null;
+    const [first, ...rest] = selected.name.split(" ");
+    return {
+      firstName: first ?? selected.name,
+      lastName: rest.join(" "),
+      email: selected.email,
+      phone: selected.phone,
+      address: selected.address,
+      city: selected.city,
+    };
+  }, [order, customerMode, newCustomer, selected]);
+
+  /** Documento en borrador: mismo componente y mismos totales que el final. */
+  const preview = useMemo(
+    () =>
+      draftInvoiceView({
+        number: nextNumberPreview,
+        issuedAt: new Date(issuedAtISO),
+        customer: previewCustomer,
+        orderCode: order?.code ?? null,
+        notes,
+        lines,
+      }),
+    [nextNumberPreview, issuedAtISO, previewCustomer, order, notes, lines],
+  );
 
   /** Aplica un cambio parcial a una línea, sin tocar las demás. */
   function patchLine(index: number, patch: Partial<InvoiceLineInput>) {
@@ -264,31 +341,32 @@ export function InvoiceBuilder({
             </p>
           </div>
         ) : (
+          /* Campos controlados: la vista previa refleja lo que se escribe. */
           <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className={label}>Nombre *</label>
-              <input name="newFirstName" className={input} placeholder="María" />
-            </div>
-            <div>
-              <label className={label}>Apellidos</label>
-              <input name="newLastName" className={input} placeholder="Gómez" />
-            </div>
-            <div>
-              <label className={label}>Teléfono *</label>
-              <input name="newPhone" className={input} inputMode="tel" placeholder="300 000 0000" />
-            </div>
-            <div>
-              <label className={label}>Correo</label>
-              <input name="newEmail" className={input} inputMode="email" placeholder="cliente@correo.com" />
-            </div>
-            <div>
-              <label className={label}>Ciudad</label>
-              <input name="newCity" className={input} placeholder="Bogotá" />
-            </div>
-            <div>
-              <label className={label}>Dirección</label>
-              <input name="newAddress" className={input} placeholder="Cra 00 #00-00" />
-            </div>
+            {(
+              [
+                ["firstName", "newFirstName", "Nombre *", "María", "text"],
+                ["lastName", "newLastName", "Apellidos", "Gómez", "text"],
+                ["phone", "newPhone", "Teléfono *", "300 000 0000", "tel"],
+                ["email", "newEmail", "Correo", "cliente@correo.com", "email"],
+                ["city", "newCity", "Ciudad", "Bogotá", "text"],
+                ["address", "newAddress", "Dirección", "Cra 00 #00-00", "text"],
+              ] as const
+            ).map(([key, fieldName, text, placeholder, mode]) => (
+              <div key={key}>
+                <label className={label}>{text}</label>
+                <input
+                  name={fieldName}
+                  value={newCustomer[key]}
+                  onChange={(e) =>
+                    setNewCustomer((prev) => ({ ...prev, [key]: e.target.value }))
+                  }
+                  inputMode={mode === "text" ? undefined : mode}
+                  className={input}
+                  placeholder={placeholder}
+                />
+              </div>
+            ))}
             <p className="text-xs text-mist-2 sm:col-span-2">
               Nombre y teléfono son obligatorios para registrar al cliente. Si el correo ya
               existe se reutiliza esa ficha en vez de duplicarla.
@@ -564,6 +642,8 @@ export function InvoiceBuilder({
             <textarea
               name="notes"
               rows={5}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className={input}
               placeholder="Condiciones de pago, garantía, fecha de instalación…"
             />
@@ -580,6 +660,51 @@ export function InvoiceBuilder({
             </div>
           </dl>
         </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Vista previa en vivo                                             */}
+      {/* ---------------------------------------------------------------- */}
+      <section className={card}>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg text-cloud">Vista previa</h2>
+            <p className="mt-0.5 text-xs text-mist-2">
+              Es el mismo documento que se imprime, el PDF y el que recibe el cliente.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowPreview((v) => !v)}
+            aria-expanded={showPreview}
+            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-mist transition hover:border-morado/50 hover:text-cloud"
+          >
+            {showPreview ? (
+              <>
+                <EyeOff className="h-3.5 w-3.5" /> Ocultar
+              </>
+            ) : (
+              <>
+                <Eye className="h-3.5 w-3.5" /> Mostrar
+              </>
+            )}
+          </button>
+        </div>
+
+        {showPreview &&
+          (lines.some((l) => l.name.trim()) ? (
+            /* El documento tiene ancho de papel: en pantallas estrechas se
+               desplaza dentro de su caja en vez de deformar la página. */
+            <div className="overflow-x-auto">
+              <div className="min-w-[38rem]">
+                <InvoiceDocument invoice={preview} />
+              </div>
+            </div>
+          ) : (
+            <p className="rounded-xl border border-dashed border-line p-8 text-center text-sm text-mist-2">
+              Agrega al menos un producto con descripción para ver la factura.
+            </p>
+          ))}
       </section>
 
       <div className="flex flex-wrap items-center gap-3">
