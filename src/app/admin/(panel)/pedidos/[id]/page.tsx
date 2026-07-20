@@ -210,19 +210,37 @@ export default async function PedidoDetallePage({
                 })}
               </ul>
             )}
-            <form action={generateInvoice} className="flex gap-2">
-              <input type="hidden" name="orderId" value={order.id} />
-              <input
-                name="amount"
-                inputMode="numeric"
-                placeholder="Monto total (COP)"
-                defaultValue={order.total || ""}
-                className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm text-cloud outline-none focus:border-morado"
-              />
-              <button className="shrink-0 rounded-full border border-morado/50 px-4 py-2 text-sm text-morado-light transition hover:bg-morado/10">
-                Generar
-              </button>
-            </form>
+            {/* Camino recomendado: factura completa con líneas, extras e IVA. */}
+            <Link
+              href={`/admin/facturas/nueva?pedido=${order.id}`}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-morado to-naranja px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-morado/25 transition-all hover:-translate-y-0.5"
+            >
+              Facturar este pedido
+            </Link>
+            <p className="mt-2 text-xs text-mist-2">
+              Abre el constructor con el cliente y el producto ya cargados.
+            </p>
+
+            {/* Atajo histórico: remisión de una línea con el monto a mano. Se
+                conserva para cuando solo hace falta un comprobante rápido. */}
+            <details className="mt-4 border-t border-line pt-3">
+              <summary className="cursor-pointer text-xs text-mist-2 transition hover:text-mist">
+                Generar remisión rápida (solo monto)
+              </summary>
+              <form action={generateInvoice} className="mt-3 flex gap-2">
+                <input type="hidden" name="orderId" value={order.id} />
+                <input
+                  name="amount"
+                  inputMode="numeric"
+                  placeholder="Monto total (COP)"
+                  defaultValue={order.total || ""}
+                  className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm text-cloud outline-none focus:border-morado"
+                />
+                <button className="shrink-0 rounded-full border border-morado/50 px-4 py-2 text-sm text-morado-light transition hover:bg-morado/10">
+                  Generar
+                </button>
+              </form>
+            </details>
           </div>
         </div>
 

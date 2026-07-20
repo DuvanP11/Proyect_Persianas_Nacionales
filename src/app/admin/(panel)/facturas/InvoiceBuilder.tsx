@@ -38,6 +38,22 @@ export type InvoiceCustomerOption = {
   city: string | null;
 };
 
+/**
+ * Contexto cuando la factura sale de un pedido concreto.
+ * El cliente ya está decidido (es el del pedido), así que el buscador se
+ * sustituye por una ficha fija y las líneas llegan precargadas.
+ */
+export type InvoiceOrderContext = {
+  id: string;
+  code: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  quoteCode: string | null;
+  lines: InvoiceLineInput[];
+};
+
 const input =
   "w-full rounded-xl border border-line bg-white/[0.03] px-3 py-2 text-sm text-cloud placeholder:text-mist-2 " +
   "focus:border-morado/60 focus:outline-none focus:ring-2 focus:ring-morado/30 transition-colors";
@@ -59,18 +75,23 @@ const card = "rounded-2xl border border-line bg-surface/60 p-5";
 export function InvoiceBuilder({
   products,
   customers,
+  order = null,
 }: {
   products: InvoiceProductOption[];
   customers: InvoiceCustomerOption[];
+  /** Si se factura un pedido, su contexto; `null` en una factura suelta. */
+  order?: InvoiceOrderContext | null;
 }) {
   const [state, formAction, pending] = useActionState<InvoiceFormState, FormData>(
     createInvoice,
     {},
   );
 
-  const [lines, setLines] = useState<InvoiceLineInput[]>([emptyLine()]);
+  const [lines, setLines] = useState<InvoiceLineInput[]>(
+    () => order?.lines ?? [emptyLine()],
+  );
   const [customerMode, setCustomerMode] = useState<"existing" | "new">("existing");
-  const [customerId, setCustomerId] = useState("");
+  const [customerId, setCustomerId] = useState(order?.customerId ?? "");
   const [search, setSearch] = useState("");
 
   const totals = useMemo(() => computeInvoice(lines), [lines]);
@@ -125,9 +146,11 @@ export function InvoiceBuilder({
     <form action={formAction} className="space-y-6">
       {/* Las líneas ya validadas se recalculan en el servidor. */}
       <input type="hidden" name="lines" value={JSON.stringify(lines)} />
-      {customerMode === "existing" && (
+      {(customerMode === "existing" || order) && (
         <input type="hidden" name="customerId" value={customerId} />
       )}
+      {/* Enlaza la factura al pedido y actualiza su total al guardar. */}
+      {order && <input type="hidden" name="orderId" value={order.id} />}
 
       {state.error && (
         <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
@@ -138,6 +161,31 @@ export function InvoiceBuilder({
       {/* ---------------------------------------------------------------- */}
       {/* Cliente                                                          */}
       {/* ---------------------------------------------------------------- */}
+      {order ? (
+        /* Facturando un pedido: el cliente ya está decidido, no se busca. */
+        <section className={card}>
+          <h2 className="mb-4 font-display text-lg text-cloud">Cliente del pedido</h2>
+          <div className="rounded-xl border border-morado/40 bg-morado/[0.07] p-4">
+            <p className="text-sm font-medium text-cloud">{order.customerName}</p>
+            <p className="mt-0.5 text-xs text-mist-2">
+              {order.customerPhone}
+              {order.customerEmail ? ` · ${order.customerEmail}` : ""}
+            </p>
+            <p className="mt-2 border-t border-morado/25 pt-2 text-xs text-mist-2">
+              Pedido <span className="font-mono text-morado-light">{order.code}</span>
+              {order.quoteCode && ` · Cotización ${order.quoteCode}`}
+            </p>
+          </div>
+          <p className={`${label} mt-3`}>
+            La factura quedará enlazada a este pedido y actualizará su total. Para
+            facturar a otro cliente, empieza desde{" "}
+            <Link href="/admin/facturas/nueva" className="text-morado-light hover:underline">
+              Nueva factura
+            </Link>
+            .
+          </p>
+        </section>
+      ) : (
       <section className={card}>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-lg text-cloud">Cliente</h2>
@@ -248,6 +296,7 @@ export function InvoiceBuilder({
           </div>
         )}
       </section>
+      )}
 
       {/* ---------------------------------------------------------------- */}
       {/* Productos                                                        */}
