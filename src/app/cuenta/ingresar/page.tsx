@@ -42,6 +42,12 @@ export default function IngresarPage() {
           >
             {pending ? "Ingresando…" : "Ingresar"}
           </button>
+
+          <p className="text-center text-sm">
+            <Link href="/recuperar" className="text-morado-light hover:underline">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </p>
         </form>
 
         <p className="mt-6 text-center text-sm text-mist">

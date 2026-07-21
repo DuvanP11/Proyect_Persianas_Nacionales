@@ -41,6 +41,26 @@ model User {
   auditLogs     AuditLog[]
   favorites     Favorite[]
   notifications Notification[]
+  passwordResets PasswordResetToken[]
+}
+
+// ---------------------------------------------------------------------------
+//  Recuperación de contraseña (admin y cliente comparten la tabla User)
+// ---------------------------------------------------------------------------
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /**
+   * SHA-256 del token en claro. Nunca se guarda el token real: si alguien lee
+   * la base, no puede reconstruir el enlace. El token viaja solo en el correo.
+   */
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime? // se marca al consumirlo → un solo uso
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }
 
 // ---------------------------------------------------------------------------

@@ -115,6 +115,43 @@ export async function sendEmail(msg: EmailMessage): Promise<void> {
   console.info(`[mailer] enviado → ${msg.to}: ${msg.subject}`);
 }
 
+/**
+ * Envía el enlace de recuperación de contraseña.
+ *
+ * LANZA `EmailError` si no hay proveedor configurado o si el envío falla, para
+ * que quien llama pueda ofrecer la alternativa (contactar al negocio).
+ */
+export async function sendPasswordReset(
+  to: string,
+  link: string,
+  name: string | null,
+): Promise<void> {
+  const saludo = name ? `Hola, ${name}` : "Hola";
+  await sendEmail({
+    to,
+    subject: `Restablece tu contraseña — ${siteConfig.name}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;color:#111;max-width:480px;margin:auto">
+        <h2 style="color:#6d28d9;margin-bottom:8px">Restablecer contraseña</h2>
+        <p>${saludo}, recibimos una solicitud para restablecer la contraseña de tu
+           cuenta en <strong>${siteConfig.name}</strong>.</p>
+        <p style="margin:26px 0">
+          <a href="${link}" style="background:#6d28d9;color:#fff;text-decoration:none;
+             padding:12px 24px;border-radius:8px;font-weight:bold;display:inline-block">
+            Crear una nueva contraseña
+          </a>
+        </p>
+        <p style="color:#71717a;font-size:13px">Este enlace vence en 1 hora y solo puede
+           usarse una vez. Si no fuiste tú, ignora este correo: tu contraseña actual
+           sigue funcionando.</p>
+        <p style="color:#71717a;font-size:13px">Si el botón no abre, copia y pega este
+           enlace en tu navegador:<br>${link}</p>
+        <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+        <p style="color:#a1a1aa;font-size:12px">${siteConfig.name} · ${siteConfig.slogan}</p>
+      </div>`,
+  });
+}
+
 function quoteRows(q: QuoteInput): string {
   const row = (k: string, v: unknown) =>
     v ? `<tr><td style="padding:4px 12px 4px 0;color:#71717a">${k}</td><td style="padding:4px 0;color:#111">${v}</td></tr>` : "";

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { loginAction, type LoginState } from "./actions";
@@ -65,6 +66,12 @@ export default function LoginPage() {
             {pending ? "Ingresando…" : "Ingresar"}
           </button>
         </form>
+
+        <p className="mt-6 text-center text-sm text-mist">
+          <Link href="/recuperar" className="text-morado-light hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </p>
       </div>
     </div>
   );
