@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Play, ImageIcon } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { ProductMedia } from "./ProductMedia";
+import { SilentVideo } from "@/components/ui/SilentVideo";
 import { cn } from "@/lib/utils";
 
 type Media = { type: "image" | "video"; url: string };
@@ -44,7 +45,7 @@ export function ProductGallery({ product }: { product: Product }) {
             className="object-cover"
           />
         ) : (
-          <video src={current.url} controls playsInline className="h-full w-full object-cover" />
+          <SilentVideo src={current.url} controls className="h-full w-full object-cover" />
         )}
       </div>
 

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Star, Quote, ImageIcon, MessageSquare, PlayCircle } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
+import { SilentVideo } from "@/components/ui/SilentVideo";
 import { getApprovedReviews } from "@/lib/reviews";
 
 /**
@@ -175,13 +176,12 @@ export async function SocialProof() {
                 <figure className="card-premium h-full overflow-hidden">
                   <div className="relative aspect-[3/4] bg-ink-soft">
                     {item.type === "video" ? (
-                      <video
+                      <SilentVideo
                         src={item.src}
                         controls
                         // "metadata" basta para que el navegador resuelva el
                         // fotograma de #t=0.1 sin descargar el video entero.
                         preload="metadata"
-                        playsInline
                         className="h-full w-full object-cover"
                       />
                     ) : (

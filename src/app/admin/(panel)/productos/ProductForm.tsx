@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { saveProduct, type ProductFormState } from "./actions";
+import { ColorField } from "./ColorField";
 import { MediaField } from "./MediaField";
 
 export type ProductFormValues = {
@@ -205,10 +206,8 @@ export function ProductForm({
       <div className="rounded-2xl border border-line bg-surface/60 p-5">
         <h2 className="mb-4 font-display text-lg text-cloud">Colores, características y galería</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={label}>Colores (uno por línea)</label>
-            <textarea name="colors" defaultValue={values.colors} rows={5} className={`${input} font-mono text-xs`} placeholder={"Blanco humo #e7e5e4\nNegro #1c1c1c"} />
-            <p className={hint}>Formato: “Nombre #hex”. El #hex va al final.</p>
+          <div className="sm:col-span-2">
+            <ColorField defaultValue={values.colors} />
           </div>
           <div>
             <label className={label}>Características (una por línea)</label>
