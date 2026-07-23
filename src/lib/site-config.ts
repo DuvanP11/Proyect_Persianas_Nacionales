@@ -95,7 +95,8 @@ export const siteConfig = {
     // recórtalo con proporción apaisada (~2:1) o se verá diminuto.
     methods: [
       { id: "nequi", label: "Nequi", logo: "/pagos/nequi.webp" },
-      { id: "tarjetas", label: "Tarjeta débito y crédito", logo: "/pagos/tarjetas.jpg" },
+      { id: "visa", label: "Visa · débito y crédito", logo: "/pagos/visa.png" },
+      { id: "mastercard", label: "Mastercard · débito y crédito", logo: "/pagos/mastercard.webp" },
       { id: "daviplata", label: "Daviplata", logo: "/pagos/daviplata.png" },
       { id: "davivienda", label: "Davivienda", logo: "/pagos/davivienda.webp" },
     ],

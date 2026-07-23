@@ -4,29 +4,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { SilentVideo } from "@/components/ui/SilentVideo";
 import { getApprovedReviews } from "@/lib/reviews";
+import { getWorkGallery } from "@/lib/work-gallery";
 
 /**
  * Referencias + Calificaciones.
  * Muestra las reseñas aprobadas desde la base de datos (gestionadas en el panel).
  * Si todavía no hay reseñas, cae a marcadores de posición elegantes.
  */
-
-/**
- * Fotos y videos de instalaciones reales (`public/galeria`).
- *
- * Los videos NO llevan `poster`. Antes apuntaba a las fotos sueltas de más
- * abajo, que son de otro trabajo: antes de darle play se anunciaba una escena
- * que el video no contenía. El `#t=0.1` del src hace que el navegador busque ese
- * instante y pinte un fotograma del propio video como miniatura, que es lo
- * honesto y además no necesita generar imágenes aparte.
- */
-const WORK_GALLERY: { type: "image" | "video"; src: string; alt: string }[] = [
-  { type: "video", src: "/galeria/instalacion-1.mp4#t=0.1", alt: "Instalación de riel en ventana de sala" },
-  { type: "video", src: "/galeria/instalacion-2.mp4#t=0.1", alt: "Montaje de soportes sobre el marco" },
-  { type: "video", src: "/galeria/instalacion-3.mp4#t=0.1", alt: "Instalación terminada en vivienda" },
-  { type: "image", src: "/galeria/instalacion-1.jpeg", alt: "Nuestro técnico fijando el soporte al muro" },
-  { type: "image", src: "/galeria/instalacion-2.jpeg", alt: "Perforación del riel a la altura del marco" },
-];
 
 /**
  * Capturas de conversaciones reales (`public/testimonios`).
@@ -76,7 +60,10 @@ const REAL_QUOTES = [
 ];
 
 export async function SocialProof() {
-  const { reviews, average, count } = await getApprovedReviews(6);
+  const [{ reviews, average, count }, workGallery] = await Promise.all([
+    getApprovedReviews(6),
+    getWorkGallery(),
+  ]);
   // Sin reseñas aprobadas todavía se muestran los mensajes reales de WhatsApp.
   const hasReviews = reviews.length > 0;
 
@@ -154,7 +141,8 @@ export async function SocialProof() {
               ))}
         </div>
 
-        {/* Galería de trabajos realizados */}
+        {/* Galería de trabajos realizados — se administra desde el panel. */}
+        {workGallery.length > 0 && (
         <div className="mt-16">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-morado/15 text-morado-light">
@@ -171,8 +159,8 @@ export async function SocialProof() {
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {WORK_GALLERY.map((item, i) => (
-              <Reveal key={item.src} delay={i * 0.06}>
+            {workGallery.map((item, i) => (
+              <Reveal key={item.src + i} delay={i * 0.06}>
                 <figure className="card-premium h-full overflow-hidden">
                   <div className="relative aspect-[3/4] bg-ink-soft">
                     {item.type === "video" ? (
@@ -189,20 +177,24 @@ export async function SocialProof() {
                         src={item.src}
                         alt={item.alt}
                         fill
+                        unoptimized={item.src.startsWith("/api/uploads/")}
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover"
                       />
                     )}
                   </div>
-                  <figcaption className="flex items-center gap-2 px-4 py-3 text-xs text-mist">
-                    {item.type === "video" && <PlayCircle className="h-3.5 w-3.5 text-morado-light" />}
-                    {item.alt}
-                  </figcaption>
+                  {item.alt && (
+                    <figcaption className="flex items-center gap-2 px-4 py-3 text-xs text-mist">
+                      {item.type === "video" && <PlayCircle className="h-3.5 w-3.5 text-morado-light" />}
+                      {item.alt}
+                    </figcaption>
+                  )}
                 </figure>
               </Reveal>
             ))}
           </div>
         </div>
+        )}
 
         {/* Conversaciones de clientes satisfechos */}
         <div className="mt-16">

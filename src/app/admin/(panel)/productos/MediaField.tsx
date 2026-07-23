@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Download, ImageOff, Play, Trash2, UploadCloud } from "lucide-react";
+import { subirArchivo } from "@/components/admin/upload-client";
 
 /**
  * Campo de galería del formulario de producto: sube archivos, muestra en
@@ -15,9 +16,6 @@ import { Download, ImageOff, Play, Trash2, UploadCloud } from "lucide-react";
 
 type Kind = "images" | "videos";
 type Meta = { originalName: string; size: number };
-
-const MAX_DIM = 1800; // lado mayor al que se reducen las fotos antes de subir
-const SIN_COMPRIMIR = 900 * 1024; // por debajo de esto no vale la pena recomprimir
 
 const input =
   "w-full rounded-xl border border-line bg-white/[0.03] px-4 py-2.5 text-sm text-cloud placeholder:text-mist-2 focus:border-morado/60 focus:outline-none focus:ring-2 focus:ring-morado/30 transition-colors";
@@ -44,53 +42,6 @@ function nombreDeUrl(url: string): string {
 /** Archivos guardados por nosotros: /api/uploads/<name>. */
 function nombreSubido(url: string): string | null {
   return url.startsWith("/api/uploads/") ? url.slice("/api/uploads/".length).split("?")[0] : null;
-}
-
-/**
- * Reduce y recomprime la foto en el navegador (WEBP). Evita el límite de 4 MB
- * por petición y mantiene la base de datos liviana. Si algo falla, se sube el
- * archivo tal cual y que decida el servidor.
- */
-async function prepararImagen(file: File): Promise<File> {
-  const tipo = file.type.toLowerCase();
-  if (!tipo.startsWith("image/") || tipo === "image/gif" || tipo === "image/svg+xml") return file;
-  try {
-    const bitmap = await createImageBitmap(file);
-    const escala = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
-    if (escala === 1 && file.size <= SIN_COMPRIMIR) {
-      bitmap.close?.();
-      return file;
-    }
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * escala);
-    canvas.height = Math.round(bitmap.height * escala);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return file;
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close?.();
-    const blob = await new Promise<Blob | null>((res) =>
-      canvas.toBlob(res, "image/webp", 0.85),
-    );
-    if (!blob || blob.size >= file.size) return file;
-    return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".webp", {
-      type: "image/webp",
-    });
-  } catch {
-    // Formatos que el navegador no sabe decodificar (HEIC del iPhone, por
-    // ejemplo): se envía igual y el servidor responde con un mensaje claro.
-    return file;
-  }
-}
-
-function mensajePorEstado(status: number, archivo: string): string {
-  if (status === 401 || status === 403)
-    return "Tu sesión expiró. Vuelve a iniciar sesión e inténtalo otra vez.";
-  if (status === 413)
-    return `"${archivo}" pesa demasiado. El máximo por archivo es 4 MB.`;
-  if (status === 404) return "No se encontró la ruta de subida. Recarga la página.";
-  if (status >= 500)
-    return `El servidor no pudo guardar "${archivo}" (error ${status}). Revisa que la base de datos esté conectada.`;
-  return `No se pudo subir "${archivo}" (error ${status}).`;
 }
 
 export function MediaField({
@@ -163,24 +114,16 @@ export function MediaField({
     const fallos: string[] = [];
     try {
       for (const original of Array.from(files)) {
-        try {
-          const file = esImagen ? await prepararImagen(original) : original;
-          const fd = new FormData();
-          fd.append("file", file);
-          const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-          const data = await res.json().catch(() => null);
-          if (!res.ok || !data?.url) {
-            fallos.push(data?.error ?? mensajePorEstado(res.status, original.name));
-            continue;
-          }
-          nuevas.push(data.url as string);
-          setMetas((prev) => ({
-            ...prev,
-            [data.name]: { originalName: data.originalName, size: data.size },
-          }));
-        } catch {
-          fallos.push(`Se perdió la conexión al subir "${original.name}".`);
+        const r = await subirArchivo(original, { comprimir: esImagen });
+        if ("error" in r) {
+          fallos.push(r.error);
+          continue;
         }
+        nuevas.push(r.ok.url);
+        setMetas((prev) => ({
+          ...prev,
+          [r.ok.name]: { originalName: r.ok.originalName, size: r.ok.size },
+        }));
       }
     } finally {
       agregar(nuevas);

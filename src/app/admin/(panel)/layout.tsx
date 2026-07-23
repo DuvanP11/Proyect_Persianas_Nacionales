@@ -18,6 +18,7 @@ const NAV = [
   { href: "/admin/facturas", label: "Facturación", icon: "§" },
   { href: "/admin/productos", label: "Productos", icon: "◫" },
   { href: "/admin/categorias", label: "Categorías", icon: "▤" },
+  { href: "/admin/galeria", label: "Galería", icon: "▣" },
   { href: "/admin/resenas", label: "Reseñas", icon: "★" },
   { href: "/admin/promociones", label: "Promociones", icon: "%" },
   { href: "/admin/inventario", label: "Inventario", icon: "▧" },
