@@ -3,6 +3,8 @@ import { requireCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_META } from "@/lib/order-status";
 import { OrderTimeline } from "@/components/order/OrderTimeline";
+import { AccountIntro } from "@/components/cuenta/AccountIntro";
+import { SectionInsight } from "@/components/cuenta/SectionInsight";
 import { logoutCustomer, submitReview } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +59,9 @@ export default async function CuentaPage() {
           </form>
         </div>
 
+        {/* Bienvenida: qué es esta página y qué pasa después de registrarse. */}
+        <AccountIntro nombre={session.name?.split(" ")[0] ?? "Hola"} />
+
         {/* Perfil */}
         {customer && (
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -83,6 +88,13 @@ export default async function CuentaPage() {
               Nueva cotización
             </Link>
           </div>
+
+          <SectionInsight
+            id="cotizaciones"
+            ve="La lista de todas las cotizaciones que has pedido con este correo: código, producto, medidas, fecha y en qué estado va cada una."
+            como="Se agregan solas cuando envías el formulario de “Cotizar”. Nosotros vamos cambiando el estado a medida que la revisamos y te contactamos."
+            sirve="Para no perder de vista lo que pediste y saber si ya la revisamos, sin tener que escribir por WhatsApp preguntando."
+          />
 
           {quotes.length === 0 ? (
             <div className="mt-6 rounded-2xl border border-line bg-surface/60 p-8 text-center text-sm text-mist">
@@ -125,6 +137,14 @@ export default async function CuentaPage() {
         {/* Pedidos */}
         <section className="mt-12">
           <h2 className="font-display text-2xl text-cloud">Mis pedidos</h2>
+
+          <SectionInsight
+            id="pedidos"
+            ve="Cada pedido confirmado con su código, una línea de tiempo con el avance (recibido, en confección, despachado, instalado) y las remisiones de la entrega."
+            como="Se crea cuando aceptas una cotización y la convertimos en pedido. La línea de tiempo se actualiza a medida que tu pedido avanza en el taller."
+            sirve="Para saber en qué va tu trabajo y descargar el soporte de cada entrega cuando lo necesites."
+          />
+
           {orders.length === 0 ? (
             <div className="mt-6 rounded-2xl border border-line bg-surface/60 p-8 text-center text-sm text-mist">
               Aún no tienes pedidos en proceso. Cuando una cotización se convierta en pedido, podrás seguir su estado aquí.
@@ -179,6 +199,14 @@ export default async function CuentaPage() {
           <p className="mt-1 text-sm text-mist">
             Tu opinión nos ayuda. Se publicará en el sitio una vez la revisemos.
           </p>
+
+          <SectionInsight
+            id="resena"
+            ve="Un formulario corto: una calificación de 1 a 5 estrellas y un comentario con tu experiencia."
+            como="La escribes cuando quieras. Nosotros la revisamos antes de publicarla, así que no aparece de inmediato en el sitio."
+            sirve="Para que quien está decidiendo lea opiniones reales, y para que sepamos qué mejorar en el servicio."
+          />
+
           <form action={submitReview} className="mt-4 rounded-2xl border border-line bg-surface/60 p-5">
             <div className="flex items-center gap-2">
               <label className="text-sm text-mist">Calificación</label>

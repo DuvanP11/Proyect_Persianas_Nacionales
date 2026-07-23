@@ -19,6 +19,7 @@ const NAV = [
   { href: "/admin/productos", label: "Productos", icon: "◫" },
   { href: "/admin/categorias", label: "Categorías", icon: "▤" },
   { href: "/admin/galeria", label: "Galería", icon: "▣" },
+  { href: "/admin/qr", label: "Código QR", icon: "▨" },
   { href: "/admin/resenas", label: "Reseñas", icon: "★" },
   { href: "/admin/promociones", label: "Promociones", icon: "%" },
   { href: "/admin/inventario", label: "Inventario", icon: "▧" },
@@ -55,7 +56,9 @@ export default async function PanelLayout({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-8 md:flex-row md:px-6">
-      <aside className="md:w-60 md:shrink-0">
+      {/* `print:hidden`: las hojas para imprimir del panel (el QR) salen solas,
+          sin el menú lateral. */}
+      <aside className="md:w-60 md:shrink-0 print:hidden">
         <div className="rounded-2xl border border-line bg-surface/60 p-4 md:sticky md:top-6">
           <div className="px-1 pb-3">
             <Logo />
