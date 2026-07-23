@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
-import { UploadCloud } from "lucide-react";
 import { saveProduct, type ProductFormState } from "./actions";
+import { MediaField } from "./MediaField";
 
 export type ProductFormValues = {
   id?: string;
@@ -70,36 +70,6 @@ export function ProductForm({
     saveProduct,
     {},
   );
-
-  // Carga de archivos: sube al servidor y agrega la URL al textarea correspondiente.
-  const imagesRef = useRef<HTMLTextAreaElement>(null);
-  const videosRef = useRef<HTMLTextAreaElement>(null);
-  const [uploading, setUploading] = useState<"images" | "videos" | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
-  async function handleUpload(kind: "images" | "videos", files: FileList | null) {
-    if (!files || files.length === 0) return;
-    setUploadError(null);
-    setUploading(kind);
-    const ref = kind === "images" ? imagesRef : videosRef;
-    try {
-      for (const file of Array.from(files)) {
-        const fd = new FormData();
-        fd.append("file", file);
-        const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error ?? "No se pudo subir el archivo.");
-        if (ref.current) {
-          const cur = ref.current.value.trim();
-          ref.current.value = (cur ? cur + "\n" : "") + data.url;
-        }
-      }
-    } catch (e) {
-      setUploadError(e instanceof Error ? e.message : "Error al subir el archivo.");
-    } finally {
-      setUploading(null);
-    }
-  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -244,50 +214,22 @@ export function ProductForm({
             <label className={label}>Características (una por línea)</label>
             <textarea name="features" defaultValue={values.features} rows={5} className={input} placeholder={"Bloqueo total de luz\nAislamiento térmico"} />
           </div>
-          <div>
-            <div className="mb-1.5 flex items-center justify-between">
-              <label className={`${label} mb-0`}>Imágenes</label>
-              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-morado/50 px-2.5 py-1 text-xs text-morado-light transition hover:bg-morado/10">
-                <UploadCloud className="h-3.5 w-3.5" />
-                {uploading === "images" ? "Subiendo…" : "Subir fotos"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  hidden
-                  disabled={uploading !== null}
-                  onChange={(e) => handleUpload("images", e.target.files)}
-                />
-              </label>
-            </div>
-            <textarea ref={imagesRef} name="images" defaultValue={values.images} rows={4} className={`${input} font-mono text-xs`} placeholder="Sube fotos o pega URLs (una por línea)" />
-          </div>
-          <div>
-            <div className="mb-1.5 flex items-center justify-between">
-              <label className={`${label} mb-0`}>Videos</label>
-              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-morado/50 px-2.5 py-1 text-xs text-morado-light transition hover:bg-morado/10">
-                <UploadCloud className="h-3.5 w-3.5" />
-                {uploading === "videos" ? "Subiendo…" : "Subir videos"}
-                <input
-                  type="file"
-                  accept="video/*"
-                  multiple
-                  hidden
-                  disabled={uploading !== null}
-                  onChange={(e) => handleUpload("videos", e.target.files)}
-                />
-              </label>
-            </div>
-            <textarea ref={videosRef} name="videos" defaultValue={values.videos} rows={4} className={`${input} font-mono text-xs`} placeholder="Sube videos o pega URLs (una por línea)" />
-          </div>
+          <MediaField
+            kind="images"
+            titulo="Imágenes"
+            defaultValue={values.images}
+            ayuda="Se reducen y comprimen antes de subirse (máx. 4 MB por foto). Aparecen en la galería del producto."
+          />
+          <MediaField
+            kind="videos"
+            titulo="Videos"
+            defaultValue={values.videos}
+            ayuda="Máx. 4 MB por video (MP4 o WEBM). Si pesa más, súbelo a otro servicio y pega el enlace."
+          />
         </div>
-        {uploadError && (
-          <p className="mt-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-            {uploadError}
-          </p>
-        )}
         <p className={`${hint} mt-3`}>
-          Los archivos se guardan en el sitio. Las fotos aparecen en la galería del producto.
+          Los archivos quedan guardados en la base de datos del sitio, así que sobreviven a
+          cada despliegue. Pasa el mouse por una miniatura para descargarla o quitarla.
         </p>
       </div>
 

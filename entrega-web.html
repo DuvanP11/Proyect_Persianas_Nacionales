@@ -1,0 +1,492 @@
+<title>Acta de Entrega — Cortinería Nacional</title>
+<style>
+  :root {
+    --ground:      #faf9fc;
+    --surface:     #ffffff;
+    --surface-alt: #f3f0f8;
+    --ink:         #1a1622;
+    --ink-soft:    #4a4356;
+    --muted:       #6b6577;
+    --border:      #e6e1ef;
+    --purple:      #7c3aed;
+    --purple-deep: #5b21b6;
+    --orange:      #ea580c;
+    --orange-soft: #f97316;
+    --good:        #059669;
+    --good-bg:     #d9f5ea;
+    --warn:        #b45309;
+    --warn-bg:     #fbeccc;
+    --shadow:      0 1px 2px rgba(26,22,34,.04), 0 8px 30px rgba(91,33,182,.06);
+
+    --font-display: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    --font-body:    system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+    --font-serif:   Georgia, "Times New Roman", serif;
+    --font-mono:    "Cascadia Code", "Consolas", ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:      #141119;
+      --surface:     #1d1826;
+      --surface-alt: #241e30;
+      --ink:         #f3eff9;
+      --ink-soft:    #cabfe0;
+      --muted:       #948aa8;
+      --border:      #322a42;
+      --purple:      #a78bfa;
+      --purple-deep: #c4b5fd;
+      --orange:      #fb923c;
+      --orange-soft: #fdba74;
+      --good:        #34d399;
+      --good-bg:     #123024;
+      --warn:        #fbbf24;
+      --warn-bg:     #3a2c10;
+      --shadow:      0 1px 2px rgba(0,0,0,.3), 0 10px 34px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground:#faf9fc; --surface:#ffffff; --surface-alt:#f3f0f8; --ink:#1a1622;
+    --ink-soft:#4a4356; --muted:#6b6577; --border:#e6e1ef; --purple:#7c3aed;
+    --purple-deep:#5b21b6; --orange:#ea580c; --orange-soft:#f97316; --good:#059669;
+    --good-bg:#d9f5ea; --warn:#b45309; --warn-bg:#fbeccc;
+    --shadow:0 1px 2px rgba(26,22,34,.04), 0 8px 30px rgba(91,33,182,.06);
+  }
+  :root[data-theme="dark"] {
+    --ground:#141119; --surface:#1d1826; --surface-alt:#241e30; --ink:#f3eff9;
+    --ink-soft:#cabfe0; --muted:#948aa8; --border:#322a42; --purple:#a78bfa;
+    --purple-deep:#c4b5fd; --orange:#fb923c; --orange-soft:#fdba74; --good:#34d399;
+    --good-bg:#123024; --warn:#fbbf24; --warn-bg:#3a2c10;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 34px rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  /* ---------- Header / portada ---------- */
+  .masthead {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+    padding-left: clamp(1.75rem, 4vw, 3rem);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .masthead::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 7px;
+    background: linear-gradient(180deg, var(--purple), var(--orange));
+  }
+  .eyebrow {
+    font-size: .72rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--purple);
+    margin: 0 0 .9rem;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+    background: linear-gradient(100deg, var(--purple), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .doctitle {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: var(--ink);
+    margin: .55rem 0 0;
+    letter-spacing: -.01em;
+  }
+  .slogan {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    margin: 1rem 0 0;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: .85rem;
+  }
+  .meta-row div { display: flex; flex-direction: column; gap: .15rem; }
+  .meta-row .k {
+    font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .meta-row .v { color: var(--ink); font-weight: 500; }
+
+  /* ---------- Live link banner ---------- */
+  .live {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    background: linear-gradient(120deg, rgba(124,58,237,.09), rgba(234,88,12,.09));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1rem 1.4rem;
+  }
+  .live .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 22%, transparent);
+    flex: none;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+  @media (prefers-reduced-motion: reduce) { .live .dot { animation: none; } }
+  .live .txt { flex: 1 1 240px; }
+  .live .lbl { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .live a.url {
+    font-family: var(--font-mono);
+    font-size: .95rem;
+    color: var(--purple-deep);
+    word-break: break-all;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .live a.url:hover { text-decoration: underline; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: var(--ink); color: var(--ground);
+    border: none; border-radius: 10px;
+    padding: .6rem 1.1rem;
+    font: inherit; font-weight: 650; font-size: .85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); opacity: .92; }
+  .btn:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+  /* ---------- Sections ---------- */
+  section { margin-top: 2.75rem; }
+  .sec-head { display: flex; align-items: baseline; gap: .8rem; margin-bottom: 1.1rem; }
+  .sec-num {
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--orange);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: .15rem .5rem;
+    flex: none;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 750;
+    font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+    letter-spacing: -.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 650;
+    font-size: 1.02rem;
+    color: var(--ink);
+    margin: 1.75rem 0 .75rem;
+  }
+  p { margin: 0 0 1rem; color: var(--ink-soft); }
+  .lead { font-size: 1.05rem; color: var(--ink-soft); }
+
+  /* ---------- Tables ---------- */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; background: var(--surface); }
+  thead th {
+    background: var(--surface-alt);
+    color: var(--purple-deep);
+    text-align: left;
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--ink-soft); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+  tbody tr:hover td { background: color-mix(in srgb, var(--purple) 4%, transparent); }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .72rem; font-weight: 700; letter-spacing: .02em;
+    padding: .2rem .55rem; border-radius: 999px; white-space: nowrap;
+  }
+  .pill.ok   { background: var(--good-bg); color: var(--good); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+
+  /* ---------- Cards / callouts ---------- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 620px) { .grid2 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin-top: 0; }
+  .card ul { margin: 0; padding-left: 1.1rem; }
+  .card li { color: var(--ink-soft); margin-bottom: .4rem; }
+  .card li::marker { color: var(--purple); }
+
+  .note {
+    border-left: 3px solid var(--orange);
+    background: color-mix(in srgb, var(--orange) 7%, transparent);
+    border-radius: 0 10px 10px 0;
+    padding: .9rem 1.2rem;
+    margin: 1.25rem 0;
+    font-size: .92rem;
+    color: var(--ink-soft);
+  }
+  .note strong { color: var(--ink); }
+
+  .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; }
+  .checks li { display: flex; gap: .6rem; align-items: flex-start; color: var(--ink-soft); }
+  .checks li::before { content: "✓"; color: var(--good); font-weight: 800; flex: none; margin-top: .05rem; }
+
+  code.inline {
+    font-family: var(--font-mono);
+    font-size: .86em;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: .08em .4em;
+    color: var(--purple-deep);
+    word-break: break-word;
+  }
+
+  footer.doc {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .5rem;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+
+  /* ---------- Print / PDF ---------- */
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    :root {
+      --ground:#fff; --surface:#fff; --surface-alt:#f4f2f8; --ink:#141019;
+      --ink-soft:#333; --border:#d9d3e6; --shadow:none;
+    }
+    body { font-size: 11.5pt; }
+    .page { max-width: none; padding: 0; }
+    .no-print { display: none !important; }
+    .masthead, .card, .tbl-wrap, .live { box-shadow: none; break-inside: avoid; }
+    section { break-inside: avoid-page; margin-top: 1.5rem; }
+    table { font-size: 10pt; }
+    a { color: var(--purple-deep); text-decoration: none; }
+    .live { background: #f4f2f8; }
+  }
+</style>
+
+<div class="page">
+
+  <!-- ============ PORTADA ============ -->
+  <header class="masthead">
+    <p class="eyebrow">Acta de Entrega · Proyecto Web</p>
+    <h1 class="wordmark">Cortinería Nacional</h1>
+    <p class="doctitle">Plataforma web · confección, venta e instalación de cortinas y persianas</p>
+    <p class="slogan">"De la máquina a tu puerta."</p>
+
+    <div class="meta-row">
+      <div><span class="k">Fecha</span><span class="v">20 de julio de 2026</span></div>
+      <div><span class="k">Modalidad</span><span class="v">Desarrollo + servicio gestionado</span></div>
+      <div><span class="k">Estado</span><span class="v">Publicado y operativo</span></div>
+    </div>
+  </header>
+
+  <div class="live">
+    <span class="dot" aria-hidden="true"></span>
+    <div class="txt">
+      <div class="lbl">Sitio en vivo</div>
+      <a class="url" href="https://proyect-persianas-nacionales.vercel.app" target="_blank" rel="noopener">proyect-persianas-nacionales.vercel.app</a>
+    </div>
+    <button class="btn no-print" onclick="window.print()">⬇ Guardar como PDF</button>
+  </div>
+
+  <!-- ============ 1. SITIO EN VIVO ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Sitio en vivo</h2></div>
+    <p class="lead">La plataforma está <strong>publicada y operativa las 24 horas</strong>, accesible desde cualquier dispositivo en el enlace de arriba.</p>
+    <div class="note">
+      Está lista para conectarse a un <strong>dominio propio</strong> (por ejemplo
+      <code class="inline">www.cortinerianacional.com</code>) cuando el negocio lo adquiera. Ese paso es opcional y se coordina aparte.
+    </div>
+  </section>
+
+  <!-- ============ 2. QUÉ SE CONSTRUYÓ ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Qué se construyó</h2></div>
+    <p>Se entregó una <strong>plataforma completa</strong>, no solo una página informativa: comprende la web pública para los clientes y un panel de administración privado para operar el negocio.</p>
+
+    <h3>Sitio público — para los clientes finales</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Módulo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>Página principal</td><td>Portada premium con hero, beneficios, proceso, "nosotros", referencias y llamados a la acción, con animaciones.</td></tr>
+          <tr><td>Catálogo</td><td>9 líneas de producto con buscador inteligente, filtros (color, material, orden) y ficha con galería.</td></tr>
+          <tr><td>Cotización</td><td>Formulario que guarda la solicitud, envía correo y <strong>abre WhatsApp</strong> con los datos listos para atender.</td></tr>
+          <tr><td>Descuento por volante</td><td>Módulo de promoción para campañas con volantes físicos.</td></tr>
+          <tr><td>Guía "¿Cómo medir?"</td><td>Instructivo paso a paso para que el cliente mida sus ventanas.</td></tr>
+          <tr><td>Portal de cliente</td><td>Registro e ingreso de clientes para seguimiento.</td></tr>
+          <tr><td>Facturas y políticas</td><td>Consulta de factura pública y páginas legales.</td></tr>
+          <tr><td>SEO técnico</td><td>Metadata, sitemap, robots y Open Graph para posicionamiento en buscadores.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Panel de administración — privado, solo para el negocio</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Módulo</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td>Productos e inventario</td><td>Alta, edición y control de existencias.</td></tr>
+          <tr><td>Categorías</td><td>Organización del catálogo.</td></tr>
+          <tr><td>Pedidos</td><td>Seguimiento del estado de cada pedido.</td></tr>
+          <tr><td>Cotizaciones</td><td>Bandeja de solicitudes recibidas.</td></tr>
+          <tr><td>Facturación</td><td>Constructor con vista previa en vivo, firma del cliente y <strong>XML UBL 2.1</strong> (factura electrónica), con datos fiscales editables.</td></tr>
+          <tr><td>Promociones</td><td>Gestión de campañas y descuentos.</td></tr>
+          <tr><td>Reseñas</td><td>Moderación de calificaciones.</td></tr>
+          <tr><td>Empleados</td><td>Gestión de usuarios del panel.</td></tr>
+          <tr><td>Estadísticas</td><td>Dashboard con gráficas del negocio.</td></tr>
+          <tr><td>Configuración</td><td>Datos de contacto, fiscales y del sitio, editables sin tocar código.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 3. TECNOLOGÍA ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Tecnología y seguridad</h2></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Construida con</h3>
+        <ul>
+          <li><strong>Next.js 16</strong> + TypeScript (base moderna)</li>
+          <li><strong>Tailwind CSS v4</strong> + animaciones</li>
+          <li><strong>Prisma</strong> + <strong>PostgreSQL</strong> (base de datos)</li>
+          <li><strong>Vercel</strong> (hosting) + <strong>Neon</strong> (BD)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Seguridad incluida</h3>
+        <ul>
+          <li>Validación de formularios (cliente y servidor)</li>
+          <li>Rate limiting y honeypot anti-spam</li>
+          <li>Cabeceras de seguridad HTTP</li>
+          <li>Credenciales protegidas por variables de entorno</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. MODELO DE SERVICIO ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Modelo de servicio</h2></div>
+    <p>Esta entrega corresponde a un esquema de <strong>servicio gestionado</strong>: el proveedor mantiene y opera la infraestructura, y el negocio recibe la plataforma funcionando con acceso para administrar su operación.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>El proveedor mantiene</h3>
+        <ul class="checks">
+          <li>Hosting de la aplicación (Vercel)</li>
+          <li>Base de datos (Neon)</li>
+          <li>Código fuente y su mantenimiento</li>
+          <li>Despliegue de versiones y corrección de errores</li>
+          <li>Copias de seguridad y monitoreo</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>El cliente recibe</h3>
+        <ul class="checks">
+          <li>La plataforma publicada y funcionando 24/7</li>
+          <li>Acceso al panel de administración con su usuario</li>
+          <li>Gestión de productos, pedidos, facturas y más</li>
+          <li>Este documento y el soporte acordado</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      El código fuente, las credenciales de infraestructura y la base de datos forman parte del servicio y
+      permanecen administrados por el proveedor. Si a futuro se acuerda una <strong>transferencia total de
+      propiedad</strong>, se realiza como un traspaso formal aparte.
+    </div>
+  </section>
+
+  <!-- ============ 5. ACCESO ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Acceso al panel</h2></div>
+    <p>El panel de administración se encuentra en <code class="inline">…/admin/login</code>. El usuario y la contraseña se entregan de forma <strong>segura y directa</strong> al responsable del negocio — no se incluyen en este documento por seguridad.</p>
+  </section>
+
+  <!-- ============ 6. PENDIENTES ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Próximos pasos (opcional)</h2></div>
+    <p>No son fallos, sino mejoras planificadas que se activan cuando el negocio lo decida.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Mejora</th><th>Detalle</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>Dominio propio</td><td>Conectar <code class="inline">cortinerianacional.com</code> (requiere comprar el dominio).</td><td><span class="pill warn">Opcional</span></td></tr>
+          <tr><td>Fotos desde el panel</td><td>Integrar almacenamiento en la nube (Cloudinary) para subir fotos nuevas en producción.</td><td><span class="pill warn">Fase siguiente</span></td></tr>
+          <tr><td>Correos automáticos</td><td>Activar envío con proveedor (Resend); hoy la cotización abre WhatsApp y guarda en BD.</td><td><span class="pill warn">Fase siguiente</span></td></tr>
+          <tr><td>Notificaciones WhatsApp</td><td>Avisos automáticos de estado del pedido vía WhatsApp Cloud API.</td><td><span class="pill warn">Fase siguiente</span></td></tr>
+          <tr><td>Analítica</td><td>Google Analytics / Meta Pixel para medir visitas y campañas.</td><td><span class="pill warn">Fase siguiente</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 7. SOPORTE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Soporte</h2></div>
+    <p>Cualquier ajuste, error o consulta se atiende bajo el acuerdo de servicio.</p>
+    <p style="color:var(--muted);font-size:.9rem;">Contacto del proveedor: <em>por completar</em>.</p>
+  </section>
+
+  <footer class="doc">
+    <span>Cortinería Nacional · Acta de Entrega</span>
+    <span>Generado el 20 de julio de 2026</span>
+  </footer>
+
+</div>

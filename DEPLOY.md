@@ -42,10 +42,13 @@ DATABASE_URL="<cadena_de_neon>" ADMIN_EMAIL="tu@correo.com" ADMIN_PASSWORD="TuCl
 
 ## Notas
 
-- **Fotos subidas por el admin:** el almacenamiento local (`/public/uploads`) NO
-  persiste en Vercel (disco de solo lectura). Las fotos del catálogo ya vienen
-  incluidas (`/public/catalog`). Para que el admin suba fotos nuevas en producción,
-  hay que integrar **Cloudinary** (pendiente).
+- **Fotos subidas por el admin:** se guardan en la base de datos (tabla
+  `MediaAsset`) y se sirven en `/api/uploads/<archivo>`. Funciona en Vercel, donde
+  el disco es de solo lectura, y sobreviven a cada despliegue. Requisito: aplicar
+  el esquema (`npx prisma db push`) después de actualizar.
+  Límites: **4 MB por archivo** (tope de Vercel para una petición). Las fotos se
+  reducen y comprimen en el navegador antes de subirse, así que rara vez lo tocan;
+  un video más pesado hay que alojarlo aparte y pegar el enlace.
 - **Correos:** sin `RESEND_API_KEY` las cotizaciones igual funcionan (abren WhatsApp
   y se guardan en la BD); solo no se envía el correo.
 - **Dominio:** Vercel da un dominio `*.vercel.app` gratis. Puedes conectar un dominio

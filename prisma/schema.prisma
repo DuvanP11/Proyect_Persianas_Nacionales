@@ -490,6 +490,29 @@ model AuditLog {
 }
 
 // ---------------------------------------------------------------------------
+//  Archivos subidos desde el panel (fotos y videos del catálogo)
+// ---------------------------------------------------------------------------
+/// Se guardan en la base de datos y no en disco a propósito: en Vercel el
+/// sistema de archivos es de solo lectura y efímero, así que escribir en
+/// `/public/uploads` fallaba ("No se pudo subir el archivo"). Aquí el archivo
+/// viaja con la BD, sobrevive a cada despliegue y no exige otro servicio.
+model MediaAsset {
+  id           String   @id @default(cuid())
+  /// Nombre público: se sirve en /api/uploads/<name>. Único e irrepetible.
+  name         String   @unique
+  /// Nombre del archivo tal como venía del computador ("sala-blackout.jpg"),
+  /// para que el admin reconozca y descargue lo que ya subió.
+  originalName String
+  mime         String
+  size         Int
+  data         Bytes
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
 //  Configuración del sitio (editable desde el panel, sin tocar código)
 // ---------------------------------------------------------------------------
 model SiteSetting {
